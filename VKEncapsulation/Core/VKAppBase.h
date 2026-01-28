@@ -16,6 +16,7 @@ void OutputMessage(const std::format_string<Ts...> format, Ts&&... arguments) {
 class ApplicationBasePlus;
 
 class ApplicationBase {
+protected:
 	using Callback = VK_ENCAPSULATION_CALLBACK_TYPE;
 	using STypeStructureRef = STypeStructureRef<false>;
 	class PhysicalDeviceDetails {
@@ -578,7 +579,8 @@ public:
 		if (physicalDevices[0].queueFamilyCount)
 			return;
 		for (auto& i : physicalDevices)
-			if (vkGetPhysicalDeviceFeatures2 ||
+			if (apiVersion >= VK_API_VERSION_1_1 &&
+				vkGetPhysicalDeviceFeatures2 ||
 				vkGetPhysicalDeviceFeatures2KHR) {
 				if (apiVersion >= VK_API_VERSION_1_2) {
 					i.features.PNext(&i.vulkan11Features);
@@ -647,7 +649,8 @@ public:
 		if (QueueFamilyProperties(0).queueCount)
 			return;
 		uint32_t queueFamilyCount = queueFamilyProperties.size();
-		if (vkGetPhysicalDeviceQueueFamilyProperties2 ||
+		if (apiVersion >= VK_API_VERSION_1_1 &&
+			vkGetPhysicalDeviceQueueFamilyProperties2 ||
 			vkGetPhysicalDeviceQueueFamilyProperties2KHR)
 			M_ConditionalDispatch(GetPhysicalDeviceQueueFamilyProperties2, KHR, PhysicalDevice(), queueFamilyCount, queueFamilyProperties);
 		else {

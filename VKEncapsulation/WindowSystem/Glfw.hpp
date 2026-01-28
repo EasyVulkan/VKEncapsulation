@@ -85,7 +85,7 @@ bool InitializeWindow(Extent2D size, bool fullScreen = false, bool isResizable =
 		return false;
 	}
 	for (size_t i = 0; i < extensionCount; i++)
-		graphicsBase::Base().AddInstanceExtension(extensionNames[i]);
+		VkeApp::Base().AddInstanceExtension(extensionNames[i]);
 #endif
 	const ColorSpaceKHR* colorSpaces = decltype(PreInitialization_TrySetColorSpaceByOrder({})){}();
 	if (colorSpaces)
