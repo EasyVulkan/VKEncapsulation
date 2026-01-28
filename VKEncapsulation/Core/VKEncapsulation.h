@@ -29,6 +29,13 @@
 #else
 #include "VKCore.h"
 #endif
+
+#ifdef VK_ENCAPSULATION_MAY_CREATE_MULTIPLE_DEVICE
+#define M_InstantiationGuard_MayCreateMultipleDevice template<std::derived_from<void>>
+#else
+#define M_InstantiationGuard_MayCreateMultipleDevice
+#endif
+
 #include "VKAppBase.h"
 #include "VKOop.h"
 

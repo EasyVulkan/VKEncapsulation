@@ -1,7 +1,3 @@
-#ifdef VK_ENCAPSULATION_MAY_CREATE_MULTIPLE_DEVICE
-static_assert(false, "VkEncapsulation/VkApplicationBase only supports single-device context!");
-#endif
-
 #ifndef VK_ENCAPSULATION_CALLBACK_TYPE
 #define VK_ENCAPSULATION_CALLBACK_TYPE void(*)()
 #endif
@@ -666,6 +662,8 @@ public:
 			surface.Allocator(),
 			this->surface = std::move(surface);
 	}
+	// CreateDevice(...) only supports single-device context.
+	M_InstantiationGuard_MayCreateMultipleDevice
 	RESULT CreateDevice(ArrayRef<const DeviceQueueCreateInfo> queueCreateInfos = SingleQueueCreateInfo(), DeviceCreateFlags flags = 0) {
 		static constexpr QueueFlags defaultQueueFlags = VK_QUEUE_GRAPHICS_BIT | VK_QUEUE_COMPUTE_BIT | VK_QUEUE_TRANSFER_BIT;
 		static constexpr float defaultQueuePriority = 1.f;
@@ -886,6 +884,7 @@ public:
 
 	// ======== After initialization
 	// Call RecreateDevice(...) and CreateSwapchain(...) after SelectPhysicalDevice(...) if you want to switch physical device at runtime.
+	M_InstantiationGuard_MayCreateMultipleDevice
 	RESULT RecreateDevice(ArrayRef<const DeviceQueueCreateInfo> queueCreateInfos = SingleQueueCreateInfo(), DeviceCreateFlags flags = 0) {
 		if (device) {
 			if (Result result = DeviceWaitIdle();
