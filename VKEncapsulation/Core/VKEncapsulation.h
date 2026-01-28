@@ -1,4 +1,13 @@
 #pragma once
+#include <iostream>
+#include <fstream>
+#include <utility>
+#include <array>
+#include <vector>
+#include <string>
+#include <ranges>
+#include <format>
+#include <concepts>
 
 #define M_MakeStringLiteral(s) #s
 

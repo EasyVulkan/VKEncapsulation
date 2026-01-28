@@ -1,6 +1,3 @@
-#pragma once
-#include <fstream>
-
 #define VK_ENCAPSULATION_OOP_NAMESPACE_BEGIN   namespace VK_ENCAPSULATION_NAMESPACE::oop {
 #define VK_ENCAPSULATION_OOP_OBJECT_BEGIN(T)   template<> class Object<Vk##T> : public raii::Object<Vk##T>
 #define VK_ENCAPSULATION_OOP_EXTENDED_BEGIN(T) template<> struct VK_ENCAPSULATION_NAMESPACE::oop::Extended<VK_ENCAPSULATION_NAMESPACE::oop::T> : public VK_ENCAPSULATION_NAMESPACE::oop::T

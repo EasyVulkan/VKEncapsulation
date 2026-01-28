@@ -1,7 +1,3 @@
-#pragma once
-#include <iostream>
-#include <format>
-
 #ifdef VK_ENCAPSULATION_MAY_CREATE_MULTIPLE_DEVICE
 static_assert(false, "VkEncapsulation/VkApplicationBase only supports single-device context!");
 #endif
