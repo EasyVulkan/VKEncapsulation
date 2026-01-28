@@ -365,7 +365,7 @@ VK_ENCAPSULATION_OOP_OBJECT_BEGIN(Image) {
 	RESULT CopyToImage(const CopyImageToImageInfo& copyImageToImageInfo) const {
 		auto info = CopyImageToImageInfo{ copyImageToImageInfo }.
 			SrcImage(handle);
-		M_ConditionalDispatch(CopyImageToImage, EXT, info);
+		return M_ConditionalDispatch(CopyImageToImage, EXT, info);
 	}
 	AUTO   CopyToImage(ImageLayout srcImageLayout, Image_ dstImage, ImageLayout dstImageLayout, ArrayRef<const ImageCopy2> regions) const {
 		DefineFunctionRaiiClass(Image, CopyToImage,
@@ -380,7 +380,7 @@ VK_ENCAPSULATION_OOP_OBJECT_BEGIN(Image) {
 	RESULT CopyToMemory(const CopyImageToMemoryInfo& copyImageToMemoryInfo) const {
 		auto info = CopyImageToMemoryInfo{ copyImageToMemoryInfo }.
 			SrcImage(handle);
-		M_ConditionalDispatch(CopyImageToMemory, EXT, info);
+		return M_ConditionalDispatch(CopyImageToMemory, EXT, info);
 	}
 	AUTO   CopyToMemory(ImageLayout srcImageLayout, ArrayRef<const ImageToMemoryCopy> regions) const {
 		DefineFunctionRaiiClass(Image, CopyToMemory,
@@ -393,7 +393,7 @@ VK_ENCAPSULATION_OOP_OBJECT_BEGIN(Image) {
 	RESULT CopyFromMemory(const CopyMemoryToImageInfo& copyMemoryToImageInfo) const {
 		auto info = CopyMemoryToImageInfo{ copyMemoryToImageInfo }.
 			DstImage(handle);
-		M_ConditionalDispatch(CopyMemoryToImage, EXT, info);
+		return M_ConditionalDispatch(CopyMemoryToImage, EXT, info);
 	}
 	AUTO   CopyFromMemory(ImageLayout dstImageLayout, ArrayRef<const MemoryToImageCopy> regions) const {
 		DefineFunctionRaiiClass(Image, CopyFromMemory,

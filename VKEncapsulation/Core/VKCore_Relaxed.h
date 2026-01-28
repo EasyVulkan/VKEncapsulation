@@ -10632,7 +10632,7 @@ inline void CmdUpdatePipelineIndirectBufferNV(VkPipelineBindPoint pipelineBindPo
 }
 
 inline VkDeviceAddress GetPipelineIndirectDeviceAddressNV(const VkPipelineIndirectDeviceAddressInfoNV& info) {
-	VK_ENCAPSULATION_DEVICE_DISPATCH vkGetPipelineIndirectDeviceAddressNV(DeviceContext::Device(), &info);
+	return VK_ENCAPSULATION_DEVICE_DISPATCH vkGetPipelineIndirectDeviceAddressNV(DeviceContext::Device(), &info);
 }
 DefineRaiiFunction_Result(VkDeviceAddress, GetPipelineIndirectDeviceAddressNV, PipelineIndirectDeviceAddressInfoNV);
 

@@ -60,7 +60,7 @@ class ApplicationBase {
 		friend class ApplicationBase;
 		Queue_ queue = VK_NULL_HANDLE;
 		uint32_t familyIndex = 0;
-		float priority;
+		float priority = 0.f;
 	public:
 		operator Ref<const Queue_>() const { return queue; }
 		const uint32_t& FamilyIndex() const { return familyIndex; }
