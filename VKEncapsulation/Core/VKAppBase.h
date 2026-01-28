@@ -185,7 +185,7 @@ class ApplicationBase {
 	/* Non-const Function */
 	RESULT CreateDebugMessenger() {
 		if (!vkCreateDebugUtilsMessengerEXT) {
-			OutputMessage("[ vke::ApplicationContext ] ERROR\nFailed to get the function pointer of vkCreateDebugUtilsMessengerEXT!\n");
+			OutputMessage("[ vke::ApplicationBase ] ERROR\nFailed to get the function pointer of vkCreateDebugUtilsMessengerEXT!\n");
 			return VK_ERROR_EXTENSION_NOT_PRESENT;
 		}
 		static constexpr PFN_vkDebugUtilsMessengerCallbackEXT DebugUtilsMessengerCallback = [](
@@ -207,7 +207,7 @@ class ApplicationBase {
 			FnUserCallback(DebugUtilsMessengerCallback);
 		Result result = debugMessenger.Create(debugUtilsMessengerCreateInfo);
 		if (result)
-			OutputMessage("[ vke::ApplicationContext ] ERROR\nFailed to create a debug messenger!\nError code: {}\n", string_VkResult(result));
+			OutputMessage("[ vke::ApplicationBase ] ERROR\nFailed to create a debug messenger!\nError code: {}\n", string_VkResult(result));
 		return result;
 	}
 	RESULT CreateDevice_Internal(ArrayRef<const DeviceQueueCreateInfo> queueCreateInfos, DeviceCreateFlags flags) {
@@ -226,7 +226,7 @@ class ApplicationBase {
 		if (ppNext)
 			*ppNext = nullptr; // Unset &physicalDevice.features
 		if (result) {
-			OutputMessage("[ vke::ApplicationContext ] ERROR\nFailed to create a logical device!\nError code: {}\n", string_VkResult(result));
+			OutputMessage("[ vke::ApplicationBase ] ERROR\nFailed to create a logical device!\nError code: {}\n", string_VkResult(result));
 			return result;
 		}
 		// Get queues
@@ -255,7 +255,7 @@ class ApplicationBase {
 	RESULT CreateSwapchain_Internal() {
 		// Create new swapchain
 		if (Result result = swapchain.Create(swapchainCreateInfo)) {
-			OutputMessage("[ vke::ApplicationContext ] ERROR\nFailed to create a swapchain!\nError code: {}\n", string_VkResult(result));
+			OutputMessage("[ vke::ApplicationBase ] ERROR\nFailed to create a swapchain!\nError code: {}\n", string_VkResult(result));
 			return result;
 		}
 		// Destruction of the retired old swapchain is written inside SwapImage(...).
@@ -264,7 +264,7 @@ class ApplicationBase {
 
 		// Get swapchain images
 		if (Result result = GetSwapchainImagesKHR(swapchain, swapchainImages)) {
-			OutputMessage("[ vke::ApplicationContext ] ERROR\nFailed to get swapchain images!\nError code: {}\n", string_VkResult(result));
+			OutputMessage("[ vke::ApplicationBase ] ERROR\nFailed to get swapchain images!\nError code: {}\n", string_VkResult(result));
 			return result;
 		}
 
@@ -277,7 +277,7 @@ class ApplicationBase {
 		for (auto p = swapchainImageViews.data(); auto& i : swapchainImages) {
 			imageViewCreateInfo.Image(i);
 			if (Result result = p->Create(imageViewCreateInfo)) {
-				OutputMessage("[ vke::ApplicationContext ] ERROR\nFailed to create a swapchain image view!\nError code: {}\n", string_VkResult(result));
+				OutputMessage("[ vke::ApplicationBase ] ERROR\nFailed to create a swapchain image view!\nError code: {}\n", string_VkResult(result));
 				return result;
 			}
 			p++;
@@ -410,11 +410,11 @@ public:
 	}
 
 	/* Const Function */
-	// ======== If CreateInstance() fails
+	// ======== If CreateInstance(...) fails
 	RESULT CheckInstanceLayers(ArrayRef<const char*> layersToCheck) const {
 		std::vector<LayerProperties> availableLayers;
 		if (Result result = EnumerateInstanceLayerProperties(availableLayers)) {
-			OutputMessage("[ vke::ApplicationContext ] ERROR\nFailed to enumerate instance layer properties!\nError code: {}\n", string_VkResult(result));
+			OutputMessage("[ vke::ApplicationBase ] ERROR\nFailed to enumerate instance layer properties!\nError code: {}\n", string_VkResult(result));
 			return result;
 		}
 		for (auto& i : layersToCheck) {
@@ -434,8 +434,8 @@ public:
 		std::vector<ExtensionProperties> availableExtensions;
 		if (Result result = EnumerateInstanceExtensionProperties(layerName, availableExtensions)) {
 			layerName ?
-				OutputMessage("[ vke::ApplicationContext ] ERROR\nFailed to enumerate instance extension properties!\nLayer name: {}\nError code: {}\n", layerName.data(), string_VkResult(result)) :
-				OutputMessage("[ vke::ApplicationContext ] ERROR\nFailed to enumerate instance extension properties!\nError code: {}\n", string_VkResult(result));
+				OutputMessage("[ vke::ApplicationBase ] ERROR\nFailed to enumerate instance extension properties!\nLayer name: {}\nError code: {}\n", layerName.data(), string_VkResult(result)) :
+				OutputMessage("[ vke::ApplicationBase ] ERROR\nFailed to enumerate instance extension properties!\nError code: {}\n", string_VkResult(result));
 			return result;
 		}
 		for (auto& i : extensionsToCheck) {
@@ -450,13 +450,13 @@ public:
 		}
 		return VK_SUCCESS;
 	}
-	// ======== If CreateDevice() fails
+	// ======== If CreateDevice(...) fails
 	Result CheckDeviceExtensions(ArrayRef<const char*> extensionsToCheck, ArrayRef<const char> layerName = {}) const {
 		std::vector<ExtensionProperties> availableExtensions;
 		if (Result result = EnumerateDeviceExtensionProperties(layerName, availableExtensions)) {
 			layerName ?
-				OutputMessage("[ vke::ApplicationContext ] ERROR\nFailed to get the count of device extensions!\nLayer name: {}\nError code: {}\n", layerName.data(), string_VkResult(result)) :
-				OutputMessage("[ vke::ApplicationContext ] ERROR\nFailed to get the count of device extensions!\nError code: {}\n", string_VkResult(result));
+				OutputMessage("[ vke::ApplicationBase ] ERROR\nFailed to get the count of device extensions!\nLayer name: {}\nError code: {}\n", layerName.data(), string_VkResult(result)) :
+				OutputMessage("[ vke::ApplicationBase ] ERROR\nFailed to get the count of device extensions!\nError code: {}\n", string_VkResult(result));
 			return result;
 		}
 		for (auto& i : extensionsToCheck) {
@@ -475,13 +475,13 @@ public:
 	RESULT DeviceWaitIdle() const {
 		Result result = VK_ENCAPSULATION_NAMESPACE::DeviceWaitIdle();
 		if (result)
-			OutputMessage("[ vke::ApplicationContext ] ERROR\nFailed to wait for the device to be idle!\nError code: {}\n", string_VkResult(result));
+			OutputMessage("[ vke::ApplicationBase ] ERROR\nFailed to wait for the device to be idle!\nError code: {}\n", string_VkResult(result));
 		return result;
 	}
 	RESULT QueueWaitIdle(uint32_t queueIndex) const {
 		Result result = VK_ENCAPSULATION_NAMESPACE::QueueWaitIdle(queues[queueIndex]);
 		if (result)
-			OutputMessage("[ vke::ApplicationContext ] ERROR\nFailed to wait for the queue to be idle!\nError code: {}\n", string_VkResult(result));
+			OutputMessage("[ vke::ApplicationBase ] ERROR\nFailed to wait for the queue to be idle!\nError code: {}\n", string_VkResult(result));
 		return result;
 	}
 
@@ -542,7 +542,7 @@ public:
 			EnabledLayers(instanceLayers).
 			EnabledExtensions(instanceExtensions);
 		if (Result result = instance.Create(instanceCreateInfo)) {
-			OutputMessage("[ vke::ApplicationContext ] ERROR\nFailed to create a Vulkan instance!\nError code: {}\n", string_VkResult(result));
+			OutputMessage("[ vke::ApplicationBase ] ERROR\nFailed to create a Vulkan instance!\nError code: {}\n", string_VkResult(result));
 			return result;
 		}
 		OutputMessage(
@@ -560,7 +560,7 @@ public:
 		std::vector<PhysicalDevice_> _;
 		Result result = VK_ENCAPSULATION_NAMESPACE::EnumeratePhysicalDevices(_);
 		if (result)
-			OutputMessage("[ vke::ApplicationContext ] ERROR\nFailed to enumerate physical devices!\nError code: {}\n", string_VkResult(result));
+			OutputMessage("[ vke::ApplicationBase ] ERROR\nFailed to enumerate physical devices!\nError code: {}\n", string_VkResult(result));
 		else {
 			physicalDevices.resize(_.size());
 			for (auto p = physicalDevices.data(); auto& i : _)
@@ -695,7 +695,7 @@ public:
 	RESULT GetSurfaceFormats() {
 		Result result = GetPhysicalDeviceSurfaceFormatsKHR(surface, surfaceFormats);
 		if (result)
-			OutputMessage("[ vke::ApplicationContext ] ERROR\nFailed to get surface formats!\nError code: {}\n", string_VkResult(result));
+			OutputMessage("[ vke::ApplicationBase ] ERROR\nFailed to get surface formats!\nError code: {}\n", string_VkResult(result));
 		return result;
 	}
 	// Will call RecreateSwapchain() if the swapchain already exists.
@@ -732,7 +732,7 @@ public:
 		// Get surface capabilities
 		SurfaceCapabilitiesKHR surfaceCapabilities;
 		if (Result result = GetPhysicalDeviceSurfaceCapabilitiesKHR(surface, surfaceCapabilities)) {
-			OutputMessage("[ vke::ApplicationContext ] ERROR\nFailed to get physical device surface capabilities!\nError code: {}\n", string_VkResult(result));
+			OutputMessage("[ vke::ApplicationBase ] ERROR\nFailed to get physical device surface capabilities!\nError code: {}\n", string_VkResult(result));
 			return result;
 		}
 		// Set image count
@@ -760,7 +760,7 @@ public:
 		if (surfaceCapabilities.supportedUsageFlags & VK_IMAGE_USAGE_TRANSFER_DST_BIT)
 			swapchainCreateInfo.imageUsage |= VK_IMAGE_USAGE_TRANSFER_DST_BIT;
 		else
-			OutputMessage("[ vke::ApplicationContext ] WARNING\nVK_IMAGE_USAGE_TRANSFER_DST_BIT is not supported by the surface!\n");
+			OutputMessage("[ vke::ApplicationBase ] WARNING\nVK_IMAGE_USAGE_TRANSFER_DST_BIT is not supported by the surface!\n");
 
 		// Get surface formats
 		if (!surfaceFormats.size())
@@ -772,13 +772,13 @@ public:
 				SetSurfaceFormat({ VK_FORMAT_B8G8R8A8_UNORM, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR })) {
 				swapchainCreateInfo.ImageFormat(surfaceFormats[0].format);
 				swapchainCreateInfo.ImageColorSpace(surfaceFormats[0].colorSpace);
-				OutputMessage("[ vke::ApplicationContext ] WARNING\nFailed to select a four-component UNORM surface format!\n");
+				OutputMessage("[ vke::ApplicationBase ] WARNING\nFailed to select a four-component UNORM surface format!\n");
 			}
 
 		// Get surface present modes
 		std::vector<PresentModeKHR> surfacePresentModes;
 		if (Result result = GetPhysicalDeviceSurfacePresentModesKHR(surface, surfacePresentModes)) {
-			OutputMessage("[ vke::ApplicationContext ] ERROR\nFailed to get surface present modes!\nError code: {}\n", string_VkResult(result));
+			OutputMessage("[ vke::ApplicationBase ] ERROR\nFailed to get surface present modes!\nError code: {}\n", string_VkResult(result));
 			return result;
 		}
 		// Set present mode
@@ -820,7 +820,7 @@ public:
 					return result;
 				break;
 			default:
-				OutputMessage("[ vke::ApplicationContext ] ERROR\nFailed to acquire the next image!\nError code: {}\n", string_VkResult(result));
+				OutputMessage("[ vke::ApplicationBase ] ERROR\nFailed to acquire the next image!\nError code: {}\n", string_VkResult(result));
 				return result;
 			}
 		return VK_SUCCESS;
@@ -836,7 +836,7 @@ public:
 		case VK_ERROR_OUT_OF_DATE_KHR:
 			return RecreateSwapchain();
 		default:
-			OutputMessage("[ vke::ApplicationContext ] ERROR\nFailed to queue the image for presentation!\nError code: {}\n", string_VkResult(result));
+			OutputMessage("[ vke::ApplicationBase ] ERROR\nFailed to queue the image for presentation!\nError code: {}\n", string_VkResult(result));
 			return result;
 		}
 	}
@@ -856,7 +856,7 @@ public:
 	RESULT SubmitCommandBuffers(ArrayRef<const SubmitInfo> submitInfos, Fence fence = VK_NULL_HANDLE) const {
 		Result result = QueueSubmit(ThreadContext::Queue(), submitInfos, fence);
 		if (result)
-			OutputMessage("[ vke::ApplicationContext ] ERROR\nFailed to submit command buffers!\nError code: {}\n", string_VkResult(result));
+			OutputMessage("[ vke::ApplicationBase ] ERROR\nFailed to submit command buffers!\nError code: {}\n", string_VkResult(result));
 		return result;
 	}
 	AUTO   SubmitCommandBuffers(uint32_t queueIndex, ArrayRef<const Semaphore> waitSemaphores, ArrayRef<const PipelineStageFlags> waitDstStageMasks, ArrayRef<const CommandBuffer> commandBuffers, ArrayRef<const Semaphore> signalSemaphores, Fence fence = VK_NULL_HANDLE) const {
@@ -873,7 +873,7 @@ public:
 	RESULT SubmitCommandBuffers(ArrayRef<const SubmitInfo2> submitInfos, Fence fence = VK_NULL_HANDLE) const {
 		Result result = M_ConditionalDispatch(QueueSubmit2, KHR, ThreadContext::Queue(), submitInfos, fence);
 		if (result)
-			OutputMessage("[ vke::ApplicationContext ] ERROR\nFailed to submit command buffers!\nError code: {}\n", string_VkResult(result));
+			OutputMessage("[ vke::ApplicationBase ] ERROR\nFailed to submit command buffers!\nError code: {}\n", string_VkResult(result));
 		return result;
 	}
 	AUTO   SubmitCommandBuffers(uint32_t queueIndex, ArrayRef<const SemaphoreSubmitInfo> waitSemaphoreInfos, ArrayRef<const CommandBufferSubmitInfo> commandBufferInfos, ArrayRef<const SemaphoreSubmitInfo> signalSemaphoreInfos, Fence fence = VK_NULL_HANDLE) const {
@@ -885,7 +885,7 @@ public:
 	}
 
 	// ======== After initialization
-	// Call RecreateDevice() and CreateSwapchain(...) after SelectPhysicalDevice(...) if you want to switch physical device at runtime.
+	// Call RecreateDevice(...) and CreateSwapchain(...) after SelectPhysicalDevice(...) if you want to switch physical device at runtime.
 	RESULT RecreateDevice(ArrayRef<const DeviceQueueCreateInfo> queueCreateInfos = SingleQueueCreateInfo(), DeviceCreateFlags flags = 0) {
 		if (device) {
 			if (Result result = DeviceWaitIdle();
@@ -907,7 +907,7 @@ public:
 	RESULT RecreateSwapchain() {
 		SurfaceCapabilitiesKHR surfaceCapabilities;
 		if (Result result = GetPhysicalDeviceSurfaceCapabilitiesKHR(surface, surfaceCapabilities)) {
-			OutputMessage("[ vke::ApplicationContext ] ERROR\nFailed to get physical device surface capabilities!\nError code: {}\n", string_VkResult(result));
+			OutputMessage("[ vke::ApplicationBase ] ERROR\nFailed to get physical device surface capabilities!\nError code: {}\n", string_VkResult(result));
 			return result;
 		}
 		if (surfaceCapabilities.currentExtent.width == 0 ||
@@ -920,7 +920,7 @@ public:
 
 		// Wait for presentation queue to be idle
 		if (Result result = QueueWaitIdle(presentationQueueIndex)) {
-			OutputMessage("[ vke::ApplicationContext ] ERROR\nFailed to wait for the queue to be idle!\nError code: {}\n", string_VkResult(result));
+			OutputMessage("[ vke::ApplicationBase ] ERROR\nFailed to wait for the queue to be idle!\nError code: {}\n", string_VkResult(result));
 			return result;
 		};
 
