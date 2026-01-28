@@ -138,10 +138,10 @@ public:
 	_OptionalRef(T& value) : pointer(&value) {}
 	_OptionalRef(T&&) requires(fromLValue) = delete;
 	_OptionalRef(auto& wrapper) requires(requires { { wrapper.handle } -> std::same_as<T&>; }) : pointer(&wrapper.handle) {}
-	template<bool fromLValue>
-	_OptionalRef(const _OptionalRef<T, fromLValue>& other) : pointer(&other) {}
-	template<bool fromLValue>
-	_OptionalRef(const _OptionalRef<std::remove_const_t<T>, fromLValue>& other) requires(std::is_const_v<T>) : pointer(&other) {}
+	template<bool _fromLValue>
+	_OptionalRef(const _OptionalRef<T, _fromLValue>& other) : pointer(&other) {}
+	template<bool _fromLValue>
+	_OptionalRef(const _OptionalRef<std::remove_const_t<T>, _fromLValue>& other) requires(std::is_const_v<T>) : pointer(&other) {}
 	T& Get() const {
 	#ifndef NDEBUG
 		if (!pointer)
@@ -213,10 +213,10 @@ public:
 	_ArrayRef(auto* handles, size_t elementCount) requires(
 		requires { { handles->handle } -> std::convertible_to<T&>; } &&
 		sizeof* handles == sizeof(T)) : pointer(&handles->handle), count(elementCount) {}
-	template<bool fromLValue>
-	_ArrayRef(const _ArrayRef<T, fromLValue>& other) : pointer(other), count(other.size()) {}
-	template<bool fromLValue>
-	_ArrayRef(const _ArrayRef<std::remove_const_t<T>, fromLValue>& other) requires(std::is_const_v<T>) : pointer(other), count(other.size()) {}
+	template<bool _fromLValue>
+	_ArrayRef(const _ArrayRef<T, _fromLValue>& other) : pointer(other), count(other.size()) {}
+	template<bool _fromLValue>
+	_ArrayRef(const _ArrayRef<std::remove_const_t<T>, _fromLValue>& other) requires(std::is_const_v<T>) : pointer(other), count(other.size()) {}
 	operator T*() const { return pointer; }
 	size_t Count() const { return count; }
 	size_t size() const { return count; }
@@ -242,8 +242,8 @@ public:
 		!std::is_const_v<std::iter_value_t<R>>) : pointer(std::ranges::data(range)), count(sizeof(std::iter_value_t<R>)* std::ranges::size(range)) {}
 	_ArrayRef(size_t dataSize, void* pData) : pointer(pData), count(dataSize) {}
 	_ArrayRef(void* pData, size_t dataSize) : pointer(pData), count(dataSize) {}
-	template<typename T, bool fromLValue>
-	_ArrayRef(const _ArrayRef<T, fromLValue>& other) requires(!std::is_const_v<T>) : pointer(other), count(other.size()) {}
+	template<typename T, bool _fromLValue>
+	_ArrayRef(const _ArrayRef<T, _fromLValue>& other) requires(!std::is_const_v<T>) : pointer(other), count(other.size()) {}
 	operator void*() const { return pointer; }
 	size_t Count() const { return count; }
 	size_t size() const { return count; }
@@ -269,8 +269,8 @@ public:
 		std::ranges::borrowed_range<R>) : pointer(std::ranges::data(range)), count(sizeof(std::iter_value_t<R>)* std::ranges::size(range)) {}
 	_ArrayRef(size_t dataSize, const void* pData) : pointer(pData), count(dataSize) {}
 	_ArrayRef(const void* pData, size_t dataSize) : pointer(pData), count(dataSize) {}
-	template<typename T, bool fromLValue>
-	_ArrayRef(const _ArrayRef<T, fromLValue>& other) : pointer(other), count(other.size()) {}
+	template<typename T, bool _fromLValue>
+	_ArrayRef(const _ArrayRef<T, _fromLValue>& other) : pointer(other), count(other.size()) {}
 	operator const void*() const { return pointer; }
 	size_t Count() const { return count; }
 	size_t size() const { return count; }
@@ -301,8 +301,8 @@ public:
 	STypeStructureRef() = default;
 	STypeStructureRef(auto& structure) requires(requires { structure.sType; }) : pointer(reinterpret_cast<VkBaseOutStructure*>(&structure)) {}
 	STypeStructureRef(auto&& structure) requires(requires { structure.sType; } && forTemporaryUsage) : STypeStructureRef(structure) {}
-	template<bool forTemporaryUsage>
-	STypeStructureRef(const STypeStructureRef<forTemporaryUsage>& other) : pointer(&other) {}
+	template<bool _forTemporaryUsage>
+	STypeStructureRef(const STypeStructureRef<_forTemporaryUsage>& other) : pointer(&other) {}
 	VkBaseOutStructure* operator&() const { return pointer; }
 	STypeStructureRef& operator=(const STypeStructureRef&) = delete;
 };
