@@ -52,11 +52,12 @@ struct ToScreen {
 	}
 	static void CmdBeginRendering() {
 		// Transition image layout before rendering
-		CmdPipelineBarrier(VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT, VK_DEPENDENCY_BY_REGION_BIT, {}, {}, ImageMemoryBarrier{}.
-			DstAccessMask(VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT).
-			NewLayout(VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL).
-			Image(VkeApp::Base().SwapchainImage()).
-			SubresourceRange({ VK_IMAGE_ASPECT_COLOR_BIT, 0, 1, 0, 1 }));
+		CmdPipelineBarrier(VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT, VK_DEPENDENCY_BY_REGION_BIT, {}, {},
+			ImageMemoryBarrier{}.
+				DstAccessMask(VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT).
+				NewLayout(VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL).
+				Image(VkeApp::Base().SwapchainImage()).
+				SubresourceRange({ VK_IMAGE_ASPECT_COLOR_BIT, 0, 1, 0, 1 }));
 
 		auto colorAttachmentInfo = RenderingAttachmentInfo{}.
 			ImageView(VkeApp::Base().SwapchainImageView()).
@@ -70,12 +71,13 @@ struct ToScreen {
 		vke::CmdEndRendering();
 
 		// Transition image layout after rendering
-		CmdPipelineBarrier(VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT, VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT, VK_DEPENDENCY_BY_REGION_BIT, {}, {}, ImageMemoryBarrier{}.
-			SrcAccessMask(VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT).
-			OldLayout(VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL).
-			NewLayout(VK_IMAGE_LAYOUT_PRESENT_SRC_KHR).
-			Image(VkeApp::Base().SwapchainImage()).
-			SubresourceRange({ VK_IMAGE_ASPECT_COLOR_BIT, 0, 1, 0, 1 }));
+		CmdPipelineBarrier(VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT, VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT, VK_DEPENDENCY_BY_REGION_BIT, {}, {},
+			ImageMemoryBarrier{}.
+				SrcAccessMask(VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT).
+				OldLayout(VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL).
+				NewLayout(VK_IMAGE_LAYOUT_PRESENT_SRC_KHR).
+				Image(VkeApp::Base().SwapchainImage()).
+				SubresourceRange({ VK_IMAGE_ASPECT_COLOR_BIT, 0, 1, 0, 1 }));
 	}
 };
 VK_ENCAPSULATION_NAMESPACE_END

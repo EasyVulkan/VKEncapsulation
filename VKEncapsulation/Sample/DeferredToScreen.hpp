@@ -168,11 +168,12 @@ struct DeferredToScreen {
 		CreateAttachments();
 	}
 	static void CmdBeginRendering() {
-		CmdPipelineBarrier(VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT, VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT, VK_DEPENDENCY_BY_REGION_BIT, {}, {}, ImageMemoryBarrier{}.
-			DstAccessMask(VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT).
-			NewLayout(VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL).
-			Image(VkeApp::Base().SwapchainImage()).
-			SubresourceRange({ VK_IMAGE_ASPECT_COLOR_BIT, 0, 1, 0, 1 }));
+		CmdPipelineBarrier(VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT, VK_DEPENDENCY_BY_REGION_BIT, {}, {},
+			ImageMemoryBarrier{}.
+				DstAccessMask(VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT).
+				NewLayout(VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL).
+				Image(VkeApp::Base().SwapchainImage()).
+				SubresourceRange({ VK_IMAGE_ASPECT_COLOR_BIT, 0, 1, 0, 1 }));
 		CmdPipelineBarrier(VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT, VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT, VK_DEPENDENCY_BY_REGION_BIT, {}, {}, {
 			ImageMemoryBarrier{}.
 				DstAccessMask(VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT).
@@ -184,11 +185,12 @@ struct DeferredToScreen {
 				NewLayout(inputAttachmentLayout).
 				Image(attachment_albedoSpecular).
 				SubresourceRange({ VK_IMAGE_ASPECT_COLOR_BIT, 0, 1, 0, 1 }) });
-		CmdPipelineBarrier(VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT, VK_DEPENDENCY_BY_REGION_BIT, {}, {}, ImageMemoryBarrier{}.
-			DstAccessMask(VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT).
-			NewLayout(VK_IMAGE_LAYOUT_DEPTH_ATTACHMENT_OPTIMAL).
-			Image(attachment_depth).
-			SubresourceRange({ VK_IMAGE_ASPECT_DEPTH_BIT, 0, 1, 0, 1 }));
+		CmdPipelineBarrier(VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT, VK_DEPENDENCY_BY_REGION_BIT, {}, {},
+			ImageMemoryBarrier{}.
+				DstAccessMask(VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT).
+				NewLayout(VK_IMAGE_LAYOUT_DEPTH_ATTACHMENT_OPTIMAL).
+				Image(attachment_depth).
+				SubresourceRange({ VK_IMAGE_ASPECT_DEPTH_BIT, 0, 1, 0, 1 }));
 
 		auto renderingAttachmentInfos = {
 			RenderingAttachmentInfo{}.
@@ -242,12 +244,13 @@ struct DeferredToScreen {
 	static void CmdEndRendering() {
 		vke::CmdEndRendering();
 
-		CmdPipelineBarrier(VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT, VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT, VK_DEPENDENCY_BY_REGION_BIT, {}, {}, ImageMemoryBarrier{}.
-			SrcAccessMask(VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT).
-			OldLayout(VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL).
-			NewLayout(VK_IMAGE_LAYOUT_PRESENT_SRC_KHR).
-			Image(VkeApp::Base().SwapchainImage()).
-			SubresourceRange({ VK_IMAGE_ASPECT_COLOR_BIT, 0, 1, 0, 1 }));
+		CmdPipelineBarrier(VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT, VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT, VK_DEPENDENCY_BY_REGION_BIT, {}, {},
+			ImageMemoryBarrier{}.
+				SrcAccessMask(VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT).
+				OldLayout(VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL).
+				NewLayout(VK_IMAGE_LAYOUT_PRESENT_SRC_KHR).
+				Image(VkeApp::Base().SwapchainImage()).
+				SubresourceRange({ VK_IMAGE_ASPECT_COLOR_BIT, 0, 1, 0, 1 }));
 	}
 };
 VK_ENCAPSULATION_NAMESPACE_END
@@ -317,7 +320,7 @@ int main() {
 	};
 	ext::DeviceLocalBuffer vertexBuffer_perInstance(sizeof offsets, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT);
 	vertexBuffer_perInstance.TransferData(offsets);
-	
+
 	uint16_t indices[36] = { 0, 1, 2, 2, 1, 3 };
 	for (size_t i = 1; i < 6; i++)
 		for (size_t j = 0; j < 6; j++)
@@ -353,7 +356,7 @@ int main() {
 
 		CmdSetViewport(0, Viewport{ 0.f, 0.f, float(swapchainImageExtent.width), float(swapchainImageExtent.height), 0.f, 1.f });
 		CmdSetScissor(0, Rect2D{ {}, swapchainImageExtent });
-		
+
 		// G-buffer
 		auto bufferInfo = DescriptorBufferInfo{}.Buffer(uniformBuffer).Range(sizeof(glm::mat4) * 2);
 		CmdPushDescriptorSet(VK_PIPELINE_BIND_POINT_GRAPHICS, DeferredToScreen::pipelineLayout_gBuffer, 0, WriteDescriptorSet{}.
@@ -366,7 +369,7 @@ int main() {
 
 		// Set input attachment, transition layout
 		DeferredToScreen::CmdSetRenderingInputAttachmentIndices();
-		
+
 		// Composition
 		auto imageInfos = {
 			DescriptorImageInfo{ VK_NULL_HANDLE, DeferredToScreen::attachment_normalZ, DeferredToScreen::inputAttachmentLayout },
@@ -374,7 +377,7 @@ int main() {
 		CmdPushDescriptorSet(VK_PIPELINE_BIND_POINT_GRAPHICS, DeferredToScreen::pipelineLayout_composition, 0, {
 			WriteDescriptorSet{}.
 				DescriptorType(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER).
-				BufferInfo(bufferInfo.Buffer(uniformBuffer).Range(VK_WHOLE_SIZE)),
+				BufferInfo(bufferInfo.Range(VK_WHOLE_SIZE)),
 			WriteDescriptorSet{}.
 				DstBinding(1).
 				DescriptorType(VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT).
