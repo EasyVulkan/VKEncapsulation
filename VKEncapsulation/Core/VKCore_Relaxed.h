@@ -78,8 +78,8 @@
 #define DefineFunctionRaiiClass_ResultL(ResultT, F, InfoT, ArgT) class _ : public Structure<Vk##InfoT, true> { ArgT arg; public: _(ArgT arg) : arg(arg) {} ~_() { ResultT(*this); } operator ResultT() { if (this->sType == VK_STRUCTURE_TYPE_MAX_ENUM) return VK_SUCCESS; ResultT result = F(*this, *&arg); this->sType = VK_STRUCTURE_TYPE_MAX_ENUM; return result; } }
 #define DefineFunctionRaiiClass_ResultR(ResultT, F, InfoT, ArgT) class _ : public Structure<Vk##InfoT, true> { ArgT arg; public: _(ArgT arg) : arg(arg) {} ~_() { ResultT(*this); } operator ResultT() { if (this->sType == VK_STRUCTURE_TYPE_MAX_ENUM) return VK_SUCCESS; ResultT result = F(*&arg, *this); this->sType = VK_STRUCTURE_TYPE_MAX_ENUM; return result; } }
 #define DefineFunctionRaiiClass_TwoStruct(F, T0, T1, ...)        class _ : public Structure<Vk##T0, true>, public Structure<Vk##T1, true> { public: _() = default; using T0 = Structure<Vk##T0, true>; using T1 = Structure<Vk##T1, true>; using T0::ArrayRef; using T0::OptionalRef;\
-auto& PNextOf##T0(decltype(T0::pNext) pNext) { T0::pNext = pNext; return *this; } auto& AddNextStructureTo##T0(STypeStructureRef<true> next, bool allowDuplicate = false, OptionalRef<VkBaseOutStructure**> ppBack = {}) { T0::AddNextStructure(next, allowDuplicate, ppBack); return *this; }\
-auto& PNextOf##T1(decltype(T1::pNext) pNext) { T1::pNext = pNext; return *this; } auto& AddNextStructureTo##T1(STypeStructureRef<true> next, bool allowDuplicate = false, OptionalRef<VkBaseOutStructure**> ppBack = {}) { T1::AddNextStructure(next, allowDuplicate, ppBack); return *this; }\
+constexpr auto& PNextOf##T0(decltype(T0::pNext) pNext) { T0::pNext = pNext; return *this; } auto& AddNextStructureTo##T0(STypeStructureRef<true> next, bool allowDuplicate = false, OptionalRef<VkBaseOutStructure**> ppBack = {}) { T0::AddNextStructure(next, allowDuplicate, ppBack); return *this; }\
+constexpr auto& PNextOf##T1(decltype(T1::pNext) pNext) { T1::pNext = pNext; return *this; } auto& AddNextStructureTo##T1(STypeStructureRef<true> next, bool allowDuplicate = false, OptionalRef<VkBaseOutStructure**> ppBack = {}) { T1::AddNextStructure(next, allowDuplicate, ppBack); return *this; }\
 __VA_ARGS__; ~_() { F(*this, *this); } }
 #define DefineRaiiFunction(F, InfoT)                                  inline AUTO F() { DefineFunctionRaiiClass(F, InfoT); return _{}; }
 #define DefineRaiiFunction_L(F, InfoT, ArgT, arg, ...)                inline AUTO F(ArgT arg __VA_ARGS__) { DefineFunctionRaiiClass_L(F, InfoT, decltype(arg)); return _{ arg }; }
@@ -88,24 +88,22 @@ __VA_ARGS__; ~_() { F(*this, *this); } }
 #define DefineRaiiFunction_ResultL(ResultT, F, InfoT, ArgT, arg, ...) inline AUTO F(ArgT arg __VA_ARGS__) { DefineFunctionRaiiClass_ResultL(ResultT, F, InfoT, decltype(arg)); return _{ arg }; }
 #define DefineRaiiFunction_ResultR(ResultT, F, ArgT, arg, InfoT)      inline AUTO F(ArgT arg) { DefineFunctionRaiiClass_ResultR(ResultT, F, InfoT, decltype(arg)); return _{ arg }; }
 #define DefineRaiiFunction_TwoStruct(F, T0, T1, ...)                  inline AUTO F() { DefineFunctionRaiiClass_TwoStruct(F, T0, T1, __VA_ARGS__); return _{}; }
-#define DefineSetter_Copy(F, T, var)                            auto& F(T const& var) { this->var = var; return *this; }
-#define DefineSetter_CopyOptional(F, T, var, sw, op)            auto& F(T const& var) { this->var = var; sw = op; return *this; }
-#define DefineSetter_ArrayCopy(F, T, var)                       auto& F(VK_ENCAPSULATION_NAMESPACE::ArrayRef<const T, false> var) { std::memcpy(&this->var, var, sizeof this->var); return *this; }
-#define DefineSetter_Ref(F, T, var)                             auto& F(OptionalRef<T> var) { p##F = &var; return *this; }
+#define DefineSetter_Copy(F, T, var)                            constexpr auto& F(T const& var) { this->var = var; return *this; }
+#define DefineSetter_CopyOptional(F, T, var, sw, op)            constexpr auto& F(T const& var) { this->var = var; sw = op; return *this; }
+#define DefineSetter_ArrayCopy(F, T, var)                       constexpr auto& F(VK_ENCAPSULATION_NAMESPACE::ArrayRef<const T, false> var) { std::copy_n(var.data(), std::size(this->var), this->var); return *this; }
+#define DefineSetter_Ref(F, T, var)                             constexpr auto& F(OptionalRef<T> var) { p##F = &var; return *this; }
 #define DefineSetter_PointerAndRef(F, T, var)                   DefineSetter_Copy(P##F, T*, p##F); DefineSetter_Ref(F, T, var)
-#define DefineSetter_ArrayRef(F, T, var, count, ...)            auto& F(ArrayRef<T> var) { count = var.size(); p##F = var; __VA_ARGS__; return *this; }
-#define DefineSetter_ArrayRefIgnoreC(F, T, var)                 auto& F(ArrayRef<T> var) { p##F = var; return *this; }
-#define DefineSetter_ArrayRefSpecialP(F, T, var, count, p)      auto& F(ArrayRef<T> var) { count = var.size(); p = var; return *this; }
-#define DefineSetterForUnionWrapper_Copy(F, T, var)             auto& F(T const& var) { value.var = var; return *this; }
-#define DefineSetterForUnionWrapper_ArrayCopy(F, T, var, count) auto& F(VK_ENCAPSULATION_NAMESPACE::ArrayRef<T, false> var) { std::memcpy(&value.var, var, sizeof value.var); return *this; }
+#define DefineSetter_ArrayRef(F, T, var, count, ...)            constexpr auto& F(ArrayRef<T> var) { count = var.size(); p##F = var; __VA_ARGS__; return *this; }
+#define DefineSetter_ArrayRefIgnoreC(F, T, var)                 constexpr auto& F(ArrayRef<T> var) { p##F = var; return *this; }
+#define DefineSetter_ArrayRefSpecialP(F, T, var, count, p)      constexpr auto& F(ArrayRef<T> var) { count = var.size(); p = var; return *this; }
 #define UsingRefType template<typename T> using ArrayRef = ArrayRef<T, !forTemporaryUsage>; template<typename T> using OptionalRef = OptionalRef<T, !forTemporaryUsage>;
 #define StructureClassHeader(T, ...)         constexpr Structure() : Vk##T{ .sType = _sType<Vk##T>, __VA_ARGS__ } {} template<typename... Ts> constexpr Structure(Ts&&... args) requires(std::constructible_from<Vk##T, Ts...>) : Vk##T(std::forward<Ts>(args)...) { sType = _sType<Vk##T>; } DefineSetter_Copy(PNext, decltype(pNext), pNext) UsingRefType
 #define StructureClassHeader_NoSType(T, ...) constexpr Structure() : Vk##T{ __VA_ARGS__ } {} template<typename... Ts> constexpr Structure(Ts&&... args) requires(std::constructible_from<Vk##T, Ts...>) : Vk##T(std::forward<Ts>(args)...) {} UsingRefType
 #define StructureClassHeader_UnionWrapper(T) Structure() = default; Structure(const Vk##T& v) { std::memcpy(this, &v, sizeof v); } UsingRefType \
-operator const Vk##T&() const { return reinterpret_cast<const Vk##T&>(*this); } operator Vk##T&() { return reinterpret_cast<Vk##T&>(*this); }\
+operator const Vk##T&() const { return reinterpret_cast<const Vk##T&>(*this); } operator Vk##T&() & { return reinterpret_cast<Vk##T&>(*this); } operator Vk##T&&() && { return reinterpret_cast<Vk##T&&>(*this); }\
 const Vk##T* operator&() const { return reinterpret_cast<const Vk##T*>(this); } Vk##T* operator&() { return reinterpret_cast<Vk##T*>(this); }\
-operator _OptionalRef<const Vk##T, false>() { return reinterpret_cast<const Vk##T&>(*this); } operator _OptionalRef<const Vk##T, true>() const& { return reinterpret_cast<const Vk##T&>(*this); } operator _OptionalRef<const Vk##T, true>() && = delete;\
-operator    _ArrayRef<const Vk##T, false>() { return reinterpret_cast<const Vk##T&>(*this); } operator    _ArrayRef<const Vk##T, true>() const& { return reinterpret_cast<const Vk##T&>(*this); } operator    _ArrayRef<const Vk##T, true>() && = delete;
+operator _OptionalRef<const Vk##T, false>() const { return reinterpret_cast<const Vk##T&>(*this); } operator _OptionalRef<const Vk##T, true>() const& { return reinterpret_cast<const Vk##T&>(*this); } operator _OptionalRef<const Vk##T, true>() && = delete;\
+operator    _ArrayRef<const Vk##T, false>() const { return reinterpret_cast<const Vk##T&>(*this); } operator    _ArrayRef<const Vk##T, true>() const& { return reinterpret_cast<const Vk##T&>(*this); } operator    _ArrayRef<const Vk##T, true>() && = delete;
 #define ObjectClassHeader(T) using Handle_T = Vk##T; friend OptionalRef<Vk##T>; friend OptionalRef<Vk##T, true>; friend OptionalRef<const Vk##T>; friend OptionalRef<const Vk##T, true>; friend ArrayRef<Vk##T>; friend ArrayRef<Vk##T, true>; friend ArrayRef<const Vk##T>; friend ArrayRef<const Vk##T, true>;\
 public: Object() = default; Object(Object&&) noexcept = default; Object& operator=(Object&&) noexcept = default;\
 operator const Vk##T&() const { return handle; } const Vk##T* operator&() const { return &handle; } Object* operator&() { return this; }\
@@ -134,14 +132,14 @@ class _OptionalRef {
 protected:
 	T* const pointer = nullptr;
 public:
-	_OptionalRef(EmptyList = {}) {}
-	_OptionalRef(T& value) : pointer(&value) {}
-	_OptionalRef(T&&) requires(fromLValue) = delete;
-	_OptionalRef(auto& wrapper) requires(requires { { wrapper.handle } -> std::same_as<T&>; }) : pointer(&wrapper.handle) {}
+	constexpr _OptionalRef(EmptyList = {}) {}
+	constexpr _OptionalRef(T& value) : pointer(&value) {}
+			  _OptionalRef(T&&) requires(fromLValue) = delete;
+	constexpr _OptionalRef(auto& wrapper) requires(requires { { wrapper.handle } -> std::same_as<T&>; }) : pointer(&wrapper.handle) {}
 	template<bool _fromLValue>
-	_OptionalRef(const _OptionalRef<T, _fromLValue>& other) : pointer(&other) {}
+	constexpr _OptionalRef(const _OptionalRef<T, _fromLValue>& other) : pointer(&other) {}
 	template<bool _fromLValue>
-	_OptionalRef(const _OptionalRef<std::remove_const_t<T>, _fromLValue>& other) requires(std::is_const_v<T>) : pointer(&other) {}
+	constexpr _OptionalRef(const _OptionalRef<std::remove_const_t<T>, _fromLValue>& other) requires(std::is_const_v<T>) : pointer(&other) {}
 	T& Get() const {
 	#ifndef NDEBUG
 		if (!pointer)
@@ -149,8 +147,8 @@ public:
 	#endif
 		return *pointer;
 	}
-	operator T&() const { return Get(); }
-	T* operator&() const { return pointer; }
+	constexpr operator T&() const { return Get(); }
+	constexpr T* operator&() const { return pointer; }
 	_OptionalRef& operator=(const _OptionalRef&) = delete;
 };
 template<bool fromLValue>
@@ -158,10 +156,10 @@ class _OptionalRef<void, fromLValue> {
 protected:
 	void* const pointer = nullptr;
 public:
-	_OptionalRef(EmptyList = {}) {}
-	_OptionalRef(auto& value) : pointer(&value) {}
-	_OptionalRef(auto&&) requires(fromLValue) = delete;
-	void* operator&() const { return pointer; }
+	constexpr _OptionalRef(EmptyList = {}) {}
+	constexpr _OptionalRef(auto& value) : pointer(&value) {}
+			  _OptionalRef(auto&&) requires(fromLValue) = delete;
+	constexpr void* operator&() const { return pointer; }
 	_OptionalRef& operator=(const _OptionalRef&) = delete;
 };
 template<bool fromLValue>
@@ -169,10 +167,10 @@ class _OptionalRef<const void, fromLValue> {
 protected:
 	const void* const pointer = nullptr;
 public:
-	_OptionalRef(EmptyList = {}) {}
-	_OptionalRef(const auto& value) : pointer(&value) {}
-	_OptionalRef(auto&&) requires(fromLValue) = delete;
-	const void* operator&() const { return pointer; }
+	constexpr _OptionalRef(EmptyList = {}) {}
+	constexpr _OptionalRef(const auto& value) : pointer(&value) {}
+			  _OptionalRef(auto&&) requires(fromLValue) = delete;
+	constexpr const void* operator&() const { return pointer; }
 	_OptionalRef& operator=(const _OptionalRef&) = delete;
 };
 template<typename T, bool fromLValue = false>
@@ -186,44 +184,44 @@ protected:
 	size_t count = 0;
 public:
 	using value_type = T;
-	_ArrayRef(EmptyList = {}) {}
-	_ArrayRef(T& data) : pointer(&data), count(1) {}
-	_ArrayRef(T&&) requires(fromLValue) = delete;
-	_ArrayRef(auto& wrapper) requires(requires { { wrapper.handle } -> std::convertible_to<T&>; }) : pointer(&wrapper.handle), count(1) {}
-	_ArrayRef(std::initializer_list<std::remove_const_t<T>> list) requires(!fromLValue && std::is_const_v<T>) : pointer(list.begin()), count(list.size()) {}
+	constexpr _ArrayRef(EmptyList = {}) {}
+	constexpr _ArrayRef(T& data) : pointer(&data), count(1) {}
+			  _ArrayRef(T&&) requires(fromLValue) = delete;
+	constexpr _ArrayRef(auto& wrapper) requires(requires { { wrapper.handle } -> std::convertible_to<T&>; }) : pointer(&wrapper.handle), count(1) {}
+	constexpr _ArrayRef(std::initializer_list<std::remove_const_t<T>> list) requires(!fromLValue && std::is_const_v<T>) : pointer(list.begin()), count(list.size()) {}
 	template<typename R>
-	_ArrayRef(R&& range) requires(
+	constexpr _ArrayRef(R&& range) requires(
 		std::ranges::contiguous_range<R> &&
 		std::ranges::sized_range<R> &&
 		std::ranges::borrowed_range<R> &&
 		std::convertible_to<std::iter_value_t<R>*, T*> &&
 		sizeof(std::iter_value_t<R>) == sizeof(T)) : pointer(std::ranges::data(range)), count(std::ranges::size(range)) {}
 	template<typename R>
-	_ArrayRef(R&& range) requires(
+	constexpr _ArrayRef(R&& range) requires(
 		std::ranges::contiguous_range<R> &&
 		std::ranges::sized_range<R> &&
 		std::ranges::borrowed_range<R> &&
 		requires { { std::ranges::data(range)->handle } -> std::convertible_to<T&>; } &&
 		sizeof(std::iter_value_t<R>) == sizeof(T)) : pointer(&std::ranges::data(range)->handle), count(std::ranges::size(range)) {}
-	_ArrayRef(size_t elementCount, T* pData) : pointer(pData), count(elementCount) {}
-	_ArrayRef(size_t elementCount, auto* handles) requires(
+	constexpr _ArrayRef(size_t elementCount, T* pData) : pointer(pData), count(elementCount) {}
+	constexpr _ArrayRef(size_t elementCount, auto* handles) requires(
 		requires { { handles->handle } -> std::convertible_to<T&>; } &&
 		sizeof* handles == sizeof(T)) : pointer(&handles->handle), count(elementCount) {}
-	_ArrayRef(T* pData, size_t elementCount) : pointer(pData), count(elementCount) {}
-	_ArrayRef(auto* handles, size_t elementCount) requires(
+	constexpr _ArrayRef(T* pData, size_t elementCount) : pointer(pData), count(elementCount) {}
+	constexpr _ArrayRef(auto* handles, size_t elementCount) requires(
 		requires { { handles->handle } -> std::convertible_to<T&>; } &&
 		sizeof* handles == sizeof(T)) : pointer(&handles->handle), count(elementCount) {}
 	template<bool _fromLValue>
-	_ArrayRef(const _ArrayRef<T, _fromLValue>& other) : pointer(other), count(other.size()) {}
+	constexpr _ArrayRef(const _ArrayRef<T, _fromLValue>& other) : pointer(other), count(other.size()) {}
 	template<bool _fromLValue>
-	_ArrayRef(const _ArrayRef<std::remove_const_t<T>, _fromLValue>& other) requires(std::is_const_v<T>) : pointer(other), count(other.size()) {}
-	operator T*() const { return pointer; }
-	size_t Count() const { return count; }
-	size_t size() const { return count; }
-	T* operator->() const { return pointer; }
-	T* data() const { return pointer; }
-	T* begin() const { return pointer; }
-	T* end() const { return pointer + count; }
+	constexpr _ArrayRef(const _ArrayRef<std::remove_const_t<T>, _fromLValue>& other) requires(std::is_const_v<T>) : pointer(other), count(other.size()) {}
+	constexpr operator T*() const { return pointer; }
+	constexpr size_t Count() const { return count; }
+	constexpr size_t size() const { return count; }
+	constexpr T* operator->() const { return pointer; }
+	constexpr T* data() const { return pointer; }
+	constexpr T* begin() const { return pointer; }
+	constexpr T* end() const { return pointer + count; }
 	_ArrayRef& operator=(const _ArrayRef&) = delete;
 };
 template<bool fromLValue>
@@ -233,23 +231,23 @@ protected:
 	size_t count = 0;
 public:
 	using value_type = uint8_t;
-	_ArrayRef(EmptyList = {}) {}
+	constexpr _ArrayRef(EmptyList = {}) {}
 	template<typename R>
-	_ArrayRef(R&& range) requires(
+	constexpr _ArrayRef(R&& range) requires(
 		std::ranges::contiguous_range<R> &&
 		std::ranges::sized_range<R> &&
 		std::ranges::borrowed_range<R> &&
 		!std::is_const_v<std::iter_value_t<R>>) : pointer(std::ranges::data(range)), count(sizeof(std::iter_value_t<R>)* std::ranges::size(range)) {}
-	_ArrayRef(size_t dataSize, void* pData) : pointer(pData), count(dataSize) {}
-	_ArrayRef(void* pData, size_t dataSize) : pointer(pData), count(dataSize) {}
+	constexpr _ArrayRef(size_t dataSize, void* pData) : pointer(pData), count(dataSize) {}
+	constexpr _ArrayRef(void* pData, size_t dataSize) : pointer(pData), count(dataSize) {}
 	template<typename T, bool _fromLValue>
-	_ArrayRef(const _ArrayRef<T, _fromLValue>& other) requires(!std::is_const_v<T>) : pointer(other), count(other.size()) {}
-	operator void*() const { return pointer; }
-	size_t Count() const { return count; }
-	size_t size() const { return count; }
-	uint8_t* data() const { return reinterpret_cast<uint8_t*>(pointer); }
-	uint8_t* begin() const { return reinterpret_cast<uint8_t*>(pointer); }
-	uint8_t* end() const { return begin() + count; }
+	constexpr _ArrayRef(const _ArrayRef<T, _fromLValue>& other) requires(!std::is_const_v<T>) : pointer(other), count(other.size()) {}
+	constexpr operator void*() const { return pointer; }
+	constexpr size_t Count() const { return count; }
+	constexpr size_t size() const { return count; }
+	constexpr uint8_t* data() const { return reinterpret_cast<uint8_t*>(pointer); }
+	constexpr uint8_t* begin() const { return reinterpret_cast<uint8_t*>(pointer); }
+	constexpr uint8_t* end() const { return begin() + count; }
 	_ArrayRef& operator=(const _ArrayRef&) = delete;
 };
 template<bool fromLValue>
@@ -259,24 +257,24 @@ protected:
 	size_t count = 0;
 public:
 	using value_type = const uint8_t;
-	_ArrayRef(EmptyList = {}) {}
+	constexpr _ArrayRef(EmptyList = {}) {}
 	template<typename T>
-	_ArrayRef(std::initializer_list<T> list) requires(!fromLValue) : pointer(list.begin()), count(sizeof(T)* list.size()) {}
+	constexpr _ArrayRef(std::initializer_list<T> list) requires(!fromLValue) : pointer(list.begin()), count(sizeof(T)* list.size()) {}
 	template<typename R>
-	_ArrayRef(R&& range) requires(
+	constexpr _ArrayRef(R&& range) requires(
 		std::ranges::contiguous_range<R> &&
 		std::ranges::sized_range<R> &&
 		std::ranges::borrowed_range<R>) : pointer(std::ranges::data(range)), count(sizeof(std::iter_value_t<R>)* std::ranges::size(range)) {}
-	_ArrayRef(size_t dataSize, const void* pData) : pointer(pData), count(dataSize) {}
-	_ArrayRef(const void* pData, size_t dataSize) : pointer(pData), count(dataSize) {}
+	constexpr _ArrayRef(size_t dataSize, const void* pData) : pointer(pData), count(dataSize) {}
+	constexpr _ArrayRef(const void* pData, size_t dataSize) : pointer(pData), count(dataSize) {}
 	template<typename T, bool _fromLValue>
-	_ArrayRef(const _ArrayRef<T, _fromLValue>& other) : pointer(other), count(other.size()) {}
-	operator const void*() const { return pointer; }
-	size_t Count() const { return count; }
-	size_t size() const { return count; }
-	const uint8_t* data() const { return reinterpret_cast<const uint8_t*>(pointer); }
-	const uint8_t* begin() const { return reinterpret_cast<const uint8_t*>(pointer); }
-	const uint8_t* end() const { return begin() + count; }
+	constexpr _ArrayRef(const _ArrayRef<T, _fromLValue>& other) : pointer(other), count(other.size()) {}
+	constexpr operator const void*() const { return pointer; }
+	constexpr size_t Count() const { return count; }
+	constexpr size_t size() const { return count; }
+	constexpr const uint8_t* data() const { return reinterpret_cast<const uint8_t*>(pointer); }
+	constexpr const uint8_t* begin() const { return reinterpret_cast<const uint8_t*>(pointer); }
+	constexpr const uint8_t* end() const { return begin() + count; }
 	_ArrayRef& operator=(const _ArrayRef&) = delete;
 };
 template<typename T, bool fromLValue = false>
@@ -298,27 +296,27 @@ class STypeStructureRef {
 protected:
 	VkBaseOutStructure* const pointer = nullptr;
 public:
-	STypeStructureRef() = default;
-	STypeStructureRef(auto& structure) requires(requires { structure.sType; }) : pointer(reinterpret_cast<VkBaseOutStructure*>(&structure)) {}
-	STypeStructureRef(auto&& structure) requires(requires { structure.sType; } && forTemporaryUsage) : STypeStructureRef(structure) {}
+	constexpr STypeStructureRef() = default;
+	constexpr STypeStructureRef(auto& structure) requires(requires { structure.sType; }) : pointer(reinterpret_cast<VkBaseOutStructure*>(&structure)) {}
+	constexpr STypeStructureRef(auto&& structure) requires(requires { structure.sType; } && forTemporaryUsage) : STypeStructureRef(structure) {}
 	template<bool _forTemporaryUsage>
-	STypeStructureRef(const STypeStructureRef<_forTemporaryUsage>& other) : pointer(&other) {}
-	VkBaseOutStructure* operator&() const { return pointer; }
+	constexpr STypeStructureRef(const STypeStructureRef<_forTemporaryUsage>& other) : pointer(&other) {}
+	constexpr VkBaseOutStructure* operator&() const { return pointer; }
 	STypeStructureRef& operator=(const STypeStructureRef&) = delete;
 };
 template<typename T>
 class _HandleRef : public OptionalRef<T> {
 public:
-	explicit _HandleRef(EmptyList) {}
+	constexpr explicit _HandleRef(EmptyList) {}
 	using OptionalRef<T>::OptionalRef;
-	T& operator=(T handle) const { return OptionalRef<T>::Get() = handle; }
+	constexpr T& operator=(T handle) const { return OptionalRef<T>::Get() = handle; }
 };
 template<typename T>
 using HandleRef = _HandleRef<Native_T<T>>;
 template<typename T>
 class _HandleArrayRef : public ArrayRef<T> {
 public:
-	explicit _HandleArrayRef(EmptyList) {}
+	constexpr explicit _HandleArrayRef(EmptyList) {}
 	using ArrayRef<T>::ArrayRef;
 };
 template<typename T>
@@ -480,7 +478,7 @@ protected:
 		return SetPNext_Internal(SetPNext_Internal, pBegin, pNext, allowDuplicate);
 	}
 public:
-	auto& AddNextStructure(STypeStructureRef<forTemporaryUsage> next, bool allowDuplicate = false, OptionalRef<VkBaseOutStructure**> ppBack = {}) requires(isChainable) {
+	StructureBase& AddNextStructure(STypeStructureRef<forTemporaryUsage> next, bool allowDuplicate = false, OptionalRef<VkBaseOutStructure**> ppBack = {}) requires(isChainable) {
 		VkBaseOutStructure** _ = SetPNext(reinterpret_cast<VkBaseOutStructure*>(this)->pNext, reinterpret_cast<VkBaseOutStructure*>(&next), allowDuplicate);
 		if (&ppBack)
 			ppBack.Get() = _;
@@ -980,7 +978,7 @@ VK_ENCAPSULATION_STRUCTURE_BEGIN(ShaderModuleCreateInfo) {
 	StructureClassHeader(ShaderModuleCreateInfo);
 	DefineSetter_Copy(Flags, VkShaderModuleCreateFlags, flags);
 	DefineSetter_Copy(CodeSize, size_t, codeSize);
-	auto& Code(ArrayRef<const uint32_t> code) {
+	constexpr auto& Code(ArrayRef<const uint32_t> code) {
 		codeSize = 4 * code.size(); pCode = code; return *this;
 	};
 };
@@ -991,8 +989,8 @@ VK_ENCAPSULATION_STRUCTURE_BEGIN(PipelineCacheCreateInfo) {
 	DefineSetter_Copy(Flags, VkPipelineCacheCreateFlags, flags);
 	DefineSetter_Copy(InitialDataSize, size_t, initialDataSize);
 	DefineSetter_ArrayRef(InitialData, const void, initialData, initialDataSize);
-	auto& InitialData(const IsNotRangeOrPointer auto& initialData) { return InitialData({ sizeof *&initialData, &initialData }); }
-	auto& InitialData(IsNotRangeOrPointer auto&&) requires(!forTemporaryUsage) = delete;
+	constexpr auto& InitialData(const IsNotRangeOrPointer auto& initialData) { return InitialData({ sizeof *&initialData, &initialData }); }
+	constexpr auto& InitialData(IsNotRangeOrPointer auto&&) requires(!forTemporaryUsage) = delete;
 };
 VK_ENCAPSULATION_STRUCTURE_END(PipelineCacheCreateInfo)
 
@@ -1010,8 +1008,8 @@ VK_ENCAPSULATION_STRUCTURE_BEGIN_NO_STYPE(SpecializationInfo) {
 	DefineSetter_ArrayRef(MapEntries, const VkSpecializationMapEntry, mapEntries, mapEntryCount);
 	DefineSetter_Copy(DataSize, size_t, dataSize);
 	DefineSetter_ArrayRef(Data, const void, data, dataSize);
-	auto& Data(const IsNotRangeOrPointer auto& data) { return Data({ sizeof *&data, &data }); }
-	auto& Data(IsNotRangeOrPointer auto&&) requires(!forTemporaryUsage) = delete;
+	constexpr auto& Data(const IsNotRangeOrPointer auto& data) { return Data({ sizeof *&data, &data }); }
+	constexpr auto& Data(IsNotRangeOrPointer auto&&) requires(!forTemporaryUsage) = delete;
 };
 VK_ENCAPSULATION_STRUCTURE_END(SpecializationInfo)
 
@@ -3663,8 +3661,8 @@ VK_ENCAPSULATION_STRUCTURE_BEGIN(WriteDescriptorSetInlineUniformBlock) {
 	StructureClassHeader(WriteDescriptorSetInlineUniformBlock);
 	DefineSetter_Copy(DataSize, uint32_t, dataSize);
 	DefineSetter_ArrayRef(Data, const void, data, dataSize);
-	auto& Data(const IsNotRangeOrPointer auto& data) { return Data({ sizeof *&data, &data }); }
-	auto& Data(IsNotRangeOrPointer auto&&) requires(!forTemporaryUsage) = delete;
+	constexpr auto& Data(const IsNotRangeOrPointer auto& data) { return Data({ sizeof *&data, &data }); }
+	constexpr auto& Data(IsNotRangeOrPointer auto&&) requires(!forTemporaryUsage) = delete;
 };
 VK_ENCAPSULATION_STRUCTURE_END(WriteDescriptorSetInlineUniformBlock)
 
@@ -4158,8 +4156,8 @@ VK_ENCAPSULATION_STRUCTURE_BEGIN(BindMemoryStatus) {
 	StructureClassHeader(BindMemoryStatus);
 	DefineSetter_Ref(Result, VkResult, result);
 #if defined VK_ENCAPSULATION_RESULT_THROW || defined VK_ENCAPSULATION_RESULT_NODISCARD
-	auto& Result(OptionalRef<RESULT> result) { pResult = reinterpret_cast<VkResult*>(&result); return *this; }
-	auto& Result(EmptyList) { pResult = nullptr; return *this; }
+	constexpr auto& Result(OptionalRef<RESULT> result) { pResult = reinterpret_cast<VkResult*>(&result); return *this; }
+	constexpr auto& Result(EmptyList) { pResult = nullptr; return *this; }
 #endif
 };
 VK_ENCAPSULATION_STRUCTURE_END(BindMemoryStatus)
@@ -4183,8 +4181,8 @@ VK_ENCAPSULATION_STRUCTURE_BEGIN(PushConstantsInfo) {
 	DefineSetter_Copy(Offset, uint32_t, offset);
 	DefineSetter_Copy(Size, uint32_t, size);
 	DefineSetter_ArrayRef(Values, const void, values, size);
-	auto& Values(const IsNotRangeOrPointer auto& values) { return Values({ sizeof *&values, &values }); }
-	auto& Values(IsNotRangeOrPointer auto&&) requires(!forTemporaryUsage) = delete;
+	constexpr auto& Values(const IsNotRangeOrPointer auto& values) { return Values({ sizeof *&values, &values }); }
+	constexpr auto& Values(IsNotRangeOrPointer auto&&) requires(!forTemporaryUsage) = delete;
 };
 VK_ENCAPSULATION_STRUCTURE_END(PushConstantsInfo)
 
@@ -4204,8 +4202,8 @@ VK_ENCAPSULATION_STRUCTURE_BEGIN(PushDescriptorSetWithTemplateInfo) {
 	DefineSetter_Copy(Layout, VkPipelineLayout, layout);
 	DefineSetter_Copy(Set, uint32_t, set);
 	DefineSetter_ArrayRefIgnoreC(Data, const void, data);
-	auto& Data(const IsNotRangeOrPointer auto& data) { pData = &data; return *this; }
-	auto& Data(IsNotRangeOrPointer auto&&) requires(!forTemporaryUsage) = delete;
+	constexpr auto& Data(const IsNotRangeOrPointer auto& data) { pData = &data; return *this; }
+	constexpr auto& Data(IsNotRangeOrPointer auto&&) requires(!forTemporaryUsage) = delete;
 };
 VK_ENCAPSULATION_STRUCTURE_END(PushDescriptorSetWithTemplateInfo)
 
@@ -4503,8 +4501,8 @@ VK_ENCAPSULATION_STRUCTURE_BEGIN(PresentInfoKHR) {
 	DefineSetter_ArrayRefIgnoreC(ImageIndices, const uint32_t, imageIndices);
 	DefineSetter_ArrayRefIgnoreC(Results, VkResult, results);
 #if defined VK_ENCAPSULATION_RESULT_THROW || defined VK_ENCAPSULATION_RESULT_NODISCARD
-	auto& Results(ArrayRef<RESULT> results) { pResults = reinterpret_cast<VkResult*>(results.data()); return *this; }
-	auto& Results(EmptyList) { pResults = nullptr; return *this; }
+	constexpr auto& Results(ArrayRef<RESULT> results) { pResults = reinterpret_cast<VkResult*>(results.data()); return *this; }
+	constexpr auto& Results(EmptyList) { pResults = nullptr; return *this; }
 #endif
 };
 VK_ENCAPSULATION_STRUCTURE_END(PresentInfoKHR)
@@ -6570,7 +6568,7 @@ VK_ENCAPSULATION_STRUCTURE_END(PipelineBinaryDataInfoKHR)
 
 VK_ENCAPSULATION_STRUCTURE_BEGIN(PipelineBinaryHandlesInfoKHR) {
 	StructureClassHeader(PipelineBinaryHandlesInfoKHR);
-	auto& PipelineBinaries(HandleArrayRef<VkPipelineBinaryKHR> pipelineBinaries) { pipelineBinaryCount = pipelineBinaries.size(); pPipelineBinaries = pipelineBinaries; return *this; }
+	constexpr auto& PipelineBinaries(HandleArrayRef<VkPipelineBinaryKHR> pipelineBinaries) { pipelineBinaryCount = pipelineBinaries.size(); pPipelineBinaries = pipelineBinaries; return *this; }
 };
 VK_ENCAPSULATION_STRUCTURE_END(PipelineBinaryHandlesInfoKHR)
 
@@ -8147,8 +8145,8 @@ VK_ENCAPSULATION_STRUCTURE_BEGIN(ValidationCacheCreateInfoEXT) {
 	DefineSetter_Copy(Flags, VkValidationCacheCreateFlagsEXT, flags);
 	DefineSetter_Copy(InitialDataSize, size_t, initialDataSize);
 	DefineSetter_ArrayRef(InitialData, const void, initialData, initialDataSize);
-	auto& InitialData(const IsNotRangeOrPointer auto& initialData) { return InitialData({ sizeof *&initialData, &initialData }); }
-	auto& InitialData(IsNotRangeOrPointer auto&&) requires(!forTemporaryUsage) = delete;
+	constexpr auto& InitialData(const IsNotRangeOrPointer auto& initialData) { return InitialData({ sizeof *&initialData, &initialData }); }
+	constexpr auto& InitialData(IsNotRangeOrPointer auto&&) requires(!forTemporaryUsage) = delete;
 };
 VK_ENCAPSULATION_STRUCTURE_END(ValidationCacheCreateInfoEXT)
 
@@ -8363,9 +8361,9 @@ VK_ENCAPSULATION_STRUCTURE_END(PhysicalDeviceRayTracingPropertiesNV)
 VK_ENCAPSULATION_STRUCTURE_BEGIN_NO_STYPE(TransformMatrixKHR) {
 	StructureClassHeader_NoSType(TransformMatrixKHR);
 	// float matrix[3][4];
-	DefineSetter_ArrayCopy(Matrix, float, matrix);
-	auto& Matrix(const float(&matrix)[3][4]) { std::memcpy(this, &matrix, sizeof matrix); return *this; }
-	auto& Matrix(const std::array<std::array<float, 4>, 3>& matrix) { std::memcpy(this, &matrix, sizeof matrix); return *this; }
+	constexpr auto& Matrix(vke::ArrayRef<const float, false> matrix) { std::copy_n(matrix.data(), 12, &this->matrix[0][0]); return *this; }
+	constexpr auto& Matrix(const float (&matrix)[3][4]) { std::copy_n(&matrix[0][0], 12, &this->matrix[0][0]); return *this; }
+	constexpr auto& Matrix(const std::array<std::array<float, 4>, 3>& matrix) { std::copy_n(&matrix[0][0], 12, &this->matrix[0][0]); return *this; }
 };
 VK_ENCAPSULATION_STRUCTURE_END(TransformMatrixKHR)
 
@@ -9557,8 +9555,8 @@ VK_ENCAPSULATION_STRUCTURE_END(SamplerCaptureDescriptorDataInfoEXT)
 VK_ENCAPSULATION_STRUCTURE_BEGIN(OpaqueCaptureDescriptorDataCreateInfoEXT) {
 	StructureClassHeader(OpaqueCaptureDescriptorDataCreateInfoEXT);
 	DefineSetter_Copy(OpaqueCaptureDescriptorData, ArrayRef<const void>, opaqueCaptureDescriptorData);
-	auto& OpaqueCaptureDescriptorData(const IsNotRangeOrPointer auto& opaqueCaptureDescriptorData) { this->opaqueCaptureDescriptorData = &opaqueCaptureDescriptorData; return *this; }
-	auto& OpaqueCaptureDescriptorData(IsNotRangeOrPointer auto&&) requires(!forTemporaryUsage) = delete;
+	constexpr auto& OpaqueCaptureDescriptorData(const IsNotRangeOrPointer auto& opaqueCaptureDescriptorData) { this->opaqueCaptureDescriptorData = &opaqueCaptureDescriptorData; return *this; }
+	constexpr auto& OpaqueCaptureDescriptorData(IsNotRangeOrPointer auto&&) requires(!forTemporaryUsage) = delete;
 };
 VK_ENCAPSULATION_STRUCTURE_END(OpaqueCaptureDescriptorDataCreateInfoEXT)
 
@@ -10240,8 +10238,8 @@ VK_ENCAPSULATION_STRUCTURE_BEGIN(MicromapBuildInfoEXT) {
 	DefineSetter_Copy(DstMicromap, VkMicromapEXT, dstMicromap);
 	DefineSetter_Copy(UsageCountsCount, uint32_t, usageCountsCount);
 	DefineSetter_ArrayRef(UsageCounts, const VkMicromapUsageEXT, usageCounts, usageCountsCount);
-	auto& UsageCounts(std::pair<uint32_t, const VkMicromapUsageEXT* const*> usageCounts) { usageCountsCount = usageCounts.first; ppUsageCounts = usageCounts.second; return *this; }
-	auto& UsageCounts(std::pair<const VkMicromapUsageEXT* const*, uint32_t> usageCounts) { usageCountsCount = usageCounts.second; ppUsageCounts = usageCounts.first; return *this; }
+	constexpr auto& UsageCounts(std::pair<uint32_t, const VkMicromapUsageEXT* const*> usageCounts) { usageCountsCount = usageCounts.first; ppUsageCounts = usageCounts.second; return *this; }
+	constexpr auto& UsageCounts(std::pair<const VkMicromapUsageEXT* const*, uint32_t> usageCounts) { usageCountsCount = usageCounts.second; ppUsageCounts = usageCounts.first; return *this; }
 	DefineSetter_Copy(Data, VkDeviceOrHostAddressConstKHR, data);
 	DefineSetter_Copy(ScratchData, VkDeviceOrHostAddressKHR, scratchData);
 	DefineSetter_Copy(TriangleArray, VkDeviceOrHostAddressConstKHR, triangleArray);
@@ -10313,8 +10311,8 @@ VK_ENCAPSULATION_STRUCTURE_BEGIN(AccelerationStructureTrianglesOpacityMicromapEX
 	DefineSetter_Copy(BaseTriangle, uint32_t, baseTriangle);
 	DefineSetter_Copy(UsageCountsCount, uint32_t, usageCountsCount);
 	DefineSetter_ArrayRef(UsageCounts, const VkMicromapUsageEXT, usageCounts, usageCountsCount);
-	auto& UsageCounts(std::pair<uint32_t, const VkMicromapUsageEXT* const*> usageCounts) { usageCountsCount = usageCounts.first; ppUsageCounts = usageCounts.second; return *this; }
-	auto& UsageCounts(std::pair<const VkMicromapUsageEXT* const*, uint32_t> usageCounts) { usageCountsCount = usageCounts.second; ppUsageCounts = usageCounts.first; return *this; }
+	constexpr auto& UsageCounts(std::pair<uint32_t, const VkMicromapUsageEXT* const*> usageCounts) { usageCountsCount = usageCounts.first; ppUsageCounts = usageCounts.second; return *this; }
+	constexpr auto& UsageCounts(std::pair<const VkMicromapUsageEXT* const*, uint32_t> usageCounts) { usageCountsCount = usageCounts.second; ppUsageCounts = usageCounts.first; return *this; }
 	DefineSetter_Copy(Micromap, VkMicromapEXT, micromap);
 };
 VK_ENCAPSULATION_STRUCTURE_END(AccelerationStructureTrianglesOpacityMicromapEXT)
@@ -11508,10 +11506,10 @@ VK_ENCAPSULATION_STRUCTURE_BEGIN_NO_STYPE(LayerSettingEXT) {
 	DefineSetter_Copy(Type, VkLayerSettingTypeEXT, type);
 	DefineSetter_Copy(ValueCount, uint32_t, valueCount);
 	DefineSetter_ArrayRef(Values, const void, values, valueCount);
-	auto& Values(const IsNotRangeOrPointer auto& value) { return Values({ 1, &value }); }
-	auto& Values(const char*& value) { return Values({ 1, &value }); }
-	auto& Values(const char8_t*& value) { return Values({ 1, &value }); }
-	auto& Values(IsNotRangeOrPointer auto&&) requires(!forTemporaryUsage) = delete;
+	constexpr auto& Values(const IsNotRangeOrPointer auto& value) { return Values({ 1, &value }); }
+	constexpr auto& Values(const char*& value) { return Values({ 1, &value }); }
+	constexpr auto& Values(const char8_t*& value) { return Values({ 1, &value }); }
+	constexpr auto& Values(IsNotRangeOrPointer auto&&) requires(!forTemporaryUsage) = delete;
 };
 VK_ENCAPSULATION_STRUCTURE_END(LayerSettingEXT)
 
@@ -11635,8 +11633,8 @@ VK_ENCAPSULATION_STRUCTURE_BEGIN(DataGraphPipelineConstantARM) {
 	StructureClassHeader(DataGraphPipelineConstantARM);
 	DefineSetter_Copy(Id, uint32_t, id);
 	DefineSetter_ArrayRefIgnoreC(ConstantData, const void, constantData);
-	auto& ConstantData(const IsNotRangeOrPointer auto& constantData) { pConstantData = &constantData; return *this; }
-	auto& ConstantData(IsNotRangeOrPointer auto&&) requires(!forTemporaryUsage) = delete;
+	constexpr auto& ConstantData(const IsNotRangeOrPointer auto& constantData) { pConstantData = &constantData; return *this; }
+	constexpr auto& ConstantData(IsNotRangeOrPointer auto&&) requires(!forTemporaryUsage) = delete;
 };
 VK_ENCAPSULATION_STRUCTURE_END(DataGraphPipelineConstantARM)
 
@@ -12778,8 +12776,8 @@ VK_ENCAPSULATION_STRUCTURE_BEGIN(AccelerationStructureBuildGeometryInfoKHR) {
 	DefineSetter_Copy(DstAccelerationStructure, VkAccelerationStructureKHR, dstAccelerationStructure);
 	DefineSetter_Copy(GeometryCount, uint32_t, geometryCount);
 	DefineSetter_ArrayRef(Geometries, const VkAccelerationStructureGeometryKHR, geometries, geometryCount);
-	auto& Geometries(std::pair<uint32_t, const VkAccelerationStructureGeometryKHR* const*> geometries) { geometryCount = geometries.first; ppGeometries = geometries.second; return *this; }
-	auto& Geometries(std::pair<const VkAccelerationStructureGeometryKHR* const*, uint32_t> geometries) { geometryCount = geometries.second; ppGeometries = geometries.first; return *this; }
+	constexpr auto& Geometries(std::pair<uint32_t, const VkAccelerationStructureGeometryKHR* const*> geometries) { geometryCount = geometries.first; ppGeometries = geometries.second; return *this; }
+	constexpr auto& Geometries(std::pair<const VkAccelerationStructureGeometryKHR* const*, uint32_t> geometries) { geometryCount = geometries.second; ppGeometries = geometries.first; return *this; }
 	DefineSetter_Copy(ScratchData, VkDeviceOrHostAddressKHR, scratchData);
 };
 VK_ENCAPSULATION_STRUCTURE_END(AccelerationStructureBuildGeometryInfoKHR)
@@ -12934,8 +12932,8 @@ VK_ENCAPSULATION_STRUCTURE_BEGIN(RayTracingShaderGroupCreateInfoKHR) {
 	DefineSetter_Copy(AnyHitShader, uint32_t, anyHitShader);
 	DefineSetter_Copy(IntersectionShader, uint32_t, intersectionShader);
 	DefineSetter_ArrayRefIgnoreC(ShaderGroupCaptureReplayHandle, const void, shaderGroupCaptureReplayHandle);
-	auto& ShaderGroupCaptureReplayHandle(const IsNotRangeOrPointer auto& shaderGroupCaptureReplayHandle) { pShaderGroupCaptureReplayHandle = &shaderGroupCaptureReplayHandle; return *this; }
-	auto& ShaderGroupCaptureReplayHandle(IsNotRangeOrPointer auto&&) requires(!forTemporaryUsage) = delete;
+	constexpr auto& ShaderGroupCaptureReplayHandle(const IsNotRangeOrPointer auto& shaderGroupCaptureReplayHandle) { pShaderGroupCaptureReplayHandle = &shaderGroupCaptureReplayHandle; return *this; }
+	constexpr auto& ShaderGroupCaptureReplayHandle(IsNotRangeOrPointer auto&&) requires(!forTemporaryUsage) = delete;
 };
 VK_ENCAPSULATION_STRUCTURE_END(RayTracingShaderGroupCreateInfoKHR)
 
@@ -15051,8 +15049,6 @@ VK_ENCAPSULATION_NAMESPACE_END
 #undef DefineSetter_ArrayRef
 #undef DefineSetter_ArrayRefIgnoreC
 #undef DefineSetter_ArrayRefSpecialP
-#undef DefineSetterForUnionWrapper_Copy
-#undef DefineSetterForUnionWrapper_ArrayCopy
 #undef UsingRefType
 #undef StructureClassHeader
 #undef StructureClassHeader_NoSType
