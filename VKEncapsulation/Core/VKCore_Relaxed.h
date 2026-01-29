@@ -1,5 +1,3 @@
-#include M_VulkanSdkHeader(Volk/volk.h)
-#include M_VulkanSdkHeader(vulkan/vk_enum_string_helper.h)
 #pragma warning(disable:4267)
 #pragma warning(disable:26437)
 #undef MemoryBarrier // From winnt.h

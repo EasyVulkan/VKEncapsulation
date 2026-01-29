@@ -9,6 +9,14 @@
 #include <format>
 #include <concepts>
 
+#ifdef __clang__
+#pragma clang diagnostic ignored "-Wunused-value"
+#pragma clang diagnostic ignored "-Wdangling-else"
+#pragma clang diagnostic ignored "-Wlogical-op-parentheses"
+#pragma clang diagnostic ignored "-Wswitch"
+#pragma clang diagnostic ignored "-Wmissing-braces"
+#endif
+
 #define M_MakeStringLiteral(s) #s
 
 #ifndef M_VulkanSdkHeader
@@ -22,6 +30,15 @@
 #endif
 #ifndef M_GlfwLibrary
 #define M_GlfwLibrary(f)      M_MakeStringLiteral(f)
+#endif
+
+#include M_VulkanSdkHeader(Volk/volk.h)
+#include M_VulkanSdkHeader(vulkan/vk_enum_string_helper.h)
+
+#ifdef VK_ENCAPSULATION_ALLOW_RAII_FUNCTION
+#ifdef __clang__
+#pragma clang optimize off
+#endif
 #endif
 
 #ifdef VK_ENCAPSULATION_ALLOW_PASSING_TEMPORARY_ADDRESS_TO_SETTER
@@ -41,4 +58,7 @@
 
 #ifdef VK_ENCAPSULATION_ALLOW_RAII_FUNCTION
 #undef AUTO
+#if defined __clang__ && defined NDEBUG
+#pragma clang optimize on
+#endif
 #endif
