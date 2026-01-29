@@ -5,14 +5,14 @@
 /* Macro */
 #define VK_ENCAPSULATION_VK_CORE_VERSION 328
 
-#ifdef VK_ENCAPSULATION_MAY_CREATE_MULTIPLE_DEVICE
-#define VK_ENCAPSULATION_MAY_CREATE_MULTIPLE_THREAD
+#ifdef VK_ENCAPSULATION_MAY_CREATE_MULTIPLE_DEVICES
+#define VK_ENCAPSULATION_MAY_CREATE_MULTIPLE_THREADS
 #define M_DeviceContextSpecifier thread_local
 #else
 #define M_DeviceContextSpecifier
 #endif
 
-#ifdef VK_ENCAPSULATION_MAY_CREATE_MULTIPLE_THREAD
+#ifdef VK_ENCAPSULATION_MAY_CREATE_MULTIPLE_THREADS
 #define M_ThreadContextSpecifier thread_local
 #else
 #define M_ThreadContextSpecifier
@@ -45,7 +45,7 @@
 #endif
 
 #ifndef VK_ENCAPSULATION_DEVICE_DISPATCH
-#ifdef VK_ENCAPSULATION_MAY_CREATE_MULTIPLE_DEVICE
+#ifdef VK_ENCAPSULATION_MAY_CREATE_MULTIPLE_DEVICES
 #define VK_ENCAPSULATION_DEVICE_DISPATCH DeviceContext::FunctionTable().
 #else
 #define VK_ENCAPSULATION_DEVICE_DISPATCH
@@ -365,7 +365,7 @@ struct [[nodiscard]] RESULT {
 using RESULT = VkResult;
 #endif
 
-#ifdef VK_ENCAPSULATION_ALLOW_RAII_FUNCTION
+#ifdef VK_ENCAPSULATION_ALLOW_RAII_FUNCTIONS
 #define AUTO auto
 #else
 struct AUTO {
@@ -398,7 +398,7 @@ protected:
 public:
 	static VkPhysicalDevice PhysicalDevice() { return context.physicalDevice; }
 	static VkDevice Device() { return *context.pDevice; }
-#ifdef VK_ENCAPSULATION_MAY_CREATE_MULTIPLE_DEVICE
+#ifdef VK_ENCAPSULATION_MAY_CREATE_MULTIPLE_DEVICES
 	static const VolkDeviceTable& FunctionTable() { return *context.pFunctionTable;  }
 #endif
 };
@@ -1664,7 +1664,7 @@ inline VkResult CreateDevice(VkPhysicalDevice physicalDevice, const VkDeviceCrea
 	if (result == VK_SUCCESS)
 		_::PhysicalDevice(physicalDevice),
 		_::Device(device),
-	#ifdef VK_ENCAPSULATION_MAY_CREATE_MULTIPLE_DEVICE
+	#ifdef VK_ENCAPSULATION_MAY_CREATE_MULTIPLE_DEVICES
 		volkLoadDeviceTable(&functionTable, device),
 		_::FunctionTable(functionTable);
 	#else
@@ -1672,7 +1672,7 @@ inline VkResult CreateDevice(VkPhysicalDevice physicalDevice, const VkDeviceCrea
 	#endif
 	return result;
 }
-#ifndef VK_ENCAPSULATION_MAY_CREATE_MULTIPLE_DEVICE
+#ifndef VK_ENCAPSULATION_MAY_CREATE_MULTIPLE_DEVICES
 inline VkResult CreateDevice(VkPhysicalDevice physicalDevice, const VkDeviceCreateInfo& createInfo, HandleRef<VkDevice> device) {
 	VolkDeviceTable functionTable;
 	return CreateDevice(physicalDevice, createInfo, device, functionTable);
@@ -14048,12 +14048,12 @@ VK_ENCAPSULATION_RAII_OBJECT_BEGIN_NO_DEVICE(Device) {
 		};
 		_::PhysicalDevice(physicalDevice);
 		_::Device(handle);
-	#ifdef VK_ENCAPSULATION_MAY_CREATE_MULTIPLE_DEVICE
+	#ifdef VK_ENCAPSULATION_MAY_CREATE_MULTIPLE_DEVICES
 		_::FunctionTable(functionTable);
 	#endif
 	}
 	RESULT Create(VkPhysicalDevice physicalDevice, const VkDeviceCreateInfo& createInfo) {
-	#ifdef VK_ENCAPSULATION_MAY_CREATE_MULTIPLE_DEVICE
+	#ifdef VK_ENCAPSULATION_MAY_CREATE_MULTIPLE_DEVICES
 		this->physicalDevice = physicalDevice;
 		VkResult result = CreateDevice(physicalDevice, createInfo, *this, functionTable);
 	#else
@@ -14065,7 +14065,7 @@ VK_ENCAPSULATION_RAII_OBJECT_BEGIN_NO_DEVICE(Device) {
 	}
 protected:
 	VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
-#ifdef VK_ENCAPSULATION_MAY_CREATE_MULTIPLE_DEVICE
+#ifdef VK_ENCAPSULATION_MAY_CREATE_MULTIPLE_DEVICES
 	VolkDeviceTable functionTable = {};
 #endif
 };

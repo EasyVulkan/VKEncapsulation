@@ -9,7 +9,7 @@
 #include <format>
 #include <concepts>
 
-#ifdef __clang__
+#ifdef VK_ENCAPSULATION_IGNORE_CLANG_WARNINGS
 #pragma clang diagnostic ignored "-Wunused-value"
 #pragma clang diagnostic ignored "-Wdangling-else"
 #pragma clang diagnostic ignored "-Wlogical-op-parentheses"
@@ -35,7 +35,7 @@
 #include M_VulkanSdkHeader(Volk/volk.h)
 #include M_VulkanSdkHeader(vulkan/vk_enum_string_helper.h)
 
-#ifdef VK_ENCAPSULATION_ALLOW_RAII_FUNCTION
+#ifdef VK_ENCAPSULATION_ALLOW_RAII_FUNCTIONS
 #ifdef __clang__
 #pragma clang optimize off
 #endif
@@ -47,16 +47,16 @@
 #include "VKCore.h"
 #endif
 
-#ifdef VK_ENCAPSULATION_MAY_CREATE_MULTIPLE_DEVICE
-#define M_InstantiationGuard_MayCreateMultipleDevice template<std::derived_from<void>>
+#ifdef VK_ENCAPSULATION_MAY_CREATE_MULTIPLE_DEVICES
+#define M_InstantiationGuard_MayCreateMultipleDevices template<std::derived_from<void>>
 #else
-#define M_InstantiationGuard_MayCreateMultipleDevice
+#define M_InstantiationGuard_MayCreateMultipleDevices
 #endif
 
 #include "VKAppBase.h"
 #include "VKOop.h"
 
-#ifdef VK_ENCAPSULATION_ALLOW_RAII_FUNCTION
+#ifdef VK_ENCAPSULATION_ALLOW_RAII_FUNCTIONS
 #undef AUTO
 #if defined __clang__ && defined NDEBUG
 #pragma clang optimize on
