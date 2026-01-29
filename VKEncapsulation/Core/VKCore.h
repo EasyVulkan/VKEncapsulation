@@ -188,7 +188,10 @@ public:
 	constexpr _ArrayRef(T& data) : pointer(&data), count(1) {}
 			  _ArrayRef(T&&) requires(fromLValue) = delete;
 	constexpr _ArrayRef(auto& wrapper) requires(requires { { wrapper.handle } -> std::convertible_to<T&>; }) : pointer(&wrapper.handle), count(1) {}
-	constexpr _ArrayRef(std::initializer_list<std::remove_const_t<T>> list) requires(!fromLValue && std::is_const_v<T>) : pointer(list.begin()), count(list.size()) {}
+	constexpr _ArrayRef(const std::initializer_list<std::remove_const_t<T>>& list) requires(std::is_const_v<T>) : pointer(list.begin()), count(list.size()) {}
+#ifndef VK_ENCAPSULATION_ALLOW_PASSING_TEMPORARY_ADDRESS_TO_SETTER
+			  _ArrayRef(std::initializer_list<std::remove_const_t<T>>&&) requires(fromLValue) = delete;
+#endif
 	template<typename R>
 	constexpr _ArrayRef(R&& range) requires(
 		std::ranges::contiguous_range<R> &&
@@ -259,7 +262,11 @@ public:
 	using value_type = const uint8_t;
 	constexpr _ArrayRef(EmptyList = {}) {}
 	template<typename T>
-	constexpr _ArrayRef(std::initializer_list<T> list) requires(!fromLValue) : pointer(list.begin()), count(sizeof(T)* list.size()) {}
+	constexpr _ArrayRef(const std::initializer_list<T>& list) : pointer(list.begin()), count(sizeof(T)* list.size()) {}
+#ifndef VK_ENCAPSULATION_ALLOW_PASSING_TEMPORARY_ADDRESS_TO_SETTER
+	template<typename T>
+			  _ArrayRef(std::initializer_list<T>&&) requires(fromLValue) = delete;
+#endif
 	template<typename R>
 	constexpr _ArrayRef(R&& range) requires(
 		std::ranges::contiguous_range<R> &&
