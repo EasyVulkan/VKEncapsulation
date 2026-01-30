@@ -8265,7 +8265,7 @@ inline void CmdSetCoarseSampleOrderNV(VkCoarseSampleOrderTypeNV sampleOrderType,
 }
 
 VK_ENCAPSULATION_STRUCTURE_BEGIN(RayTracingShaderGroupCreateInfoNV) {
-	StructureClassHeader(RayTracingShaderGroupCreateInfoNV);
+	StructureClassHeader(RayTracingShaderGroupCreateInfoNV, .generalShader = VK_SHADER_UNUSED_KHR, .closestHitShader = VK_SHADER_UNUSED_KHR, .anyHitShader = VK_SHADER_UNUSED_KHR, .intersectionShader = VK_SHADER_UNUSED_KHR);
 	DefineSetter_Copy(Type, VkRayTracingShaderGroupTypeKHR, type);
 	DefineSetter_Copy(GeneralShader, uint32_t, generalShader);
 	DefineSetter_Copy(ClosestHitShader, uint32_t, closestHitShader);
@@ -12955,7 +12955,7 @@ inline void GetAccelerationStructureBuildSizesKHR(VkAccelerationStructureBuildTy
 }
 
 VK_ENCAPSULATION_STRUCTURE_BEGIN(RayTracingShaderGroupCreateInfoKHR) {
-	StructureClassHeader(RayTracingShaderGroupCreateInfoKHR);
+	StructureClassHeader(RayTracingShaderGroupCreateInfoKHR, .generalShader = VK_SHADER_UNUSED_KHR, .closestHitShader = VK_SHADER_UNUSED_KHR, .anyHitShader = VK_SHADER_UNUSED_KHR, .intersectionShader = VK_SHADER_UNUSED_KHR);
 	DefineSetter_Copy(Type, VkRayTracingShaderGroupTypeKHR, type);
 	DefineSetter_Copy(GeneralShader, uint32_t, generalShader);
 	DefineSetter_Copy(ClosestHitShader, uint32_t, closestHitShader);

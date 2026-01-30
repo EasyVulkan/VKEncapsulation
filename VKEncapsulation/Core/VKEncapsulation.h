@@ -1,20 +1,19 @@
 #pragma once
-#include <iostream>
-#include <fstream>
-#include <utility>
+#include <concepts>
 #include <array>
 #include <vector>
-#include <string>
 #include <ranges>
+#include <string>
 #include <format>
-#include <concepts>
+#include <fstream>
+#include <iostream>
 
 #ifdef VK_ENCAPSULATION_IGNORE_CLANG_WARNINGS
-#pragma clang diagnostic ignored "-Wunused-value"
 #pragma clang diagnostic ignored "-Wdangling-else"
 #pragma clang diagnostic ignored "-Wlogical-op-parentheses"
-#pragma clang diagnostic ignored "-Wswitch"
 #pragma clang diagnostic ignored "-Wmissing-braces"
+#pragma clang diagnostic ignored "-Wswitch"
+#pragma clang diagnostic ignored "-Wunused-value"
 #endif
 
 #define M_MakeStringLiteral(s) #s

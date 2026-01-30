@@ -3,7 +3,6 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "Plus/AppBasePlus.h"
 #include "Timer.h"
-#include <iostream>
 
 VK_ENCAPSULATION_EXT_NAMESPACE_BEGIN
 auto& swapchainImageExtent = VkeApp::Base().SwapchainCreateInfo().imageExtent;
@@ -97,7 +96,7 @@ int main() {
 	RenderingLoopSynchronization sync;
 
 	std::vector<oop::CommandBuffer> commandBuffers(VkeApp::Base().SwapchainImageCount());
-	oop::CommandPool commandPool({ FLAGS(VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT) });
+	oop::CommandPool commandPool(FLAGS{ VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT });
 	commandPool.AllocateBuffers(VK_COMMAND_BUFFER_LEVEL_PRIMARY, commandBuffers);
 
 	while (!WindowShouldClose()) {
@@ -105,7 +104,7 @@ int main() {
 
 		sync.SwapImage();
 		sync.Fence().WaitAndReset();
-		commandBuffers[sync].Begin(FLAGS(VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT));
+		commandBuffers[sync].Begin(FLAGS{ VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT });
 		ToScreen::CmdBeginRendering();
 
 		CmdSetViewport(0, Viewport{ 0.f, 0.f, float(swapchainImageExtent.width), float(swapchainImageExtent.height), 0.f, 1.f });

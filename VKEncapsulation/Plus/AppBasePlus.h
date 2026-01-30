@@ -176,7 +176,7 @@ public:
 		semaphores_imageIsAvailable(VkeApp::Base().SwapchainImageCount() + 1),
 		semaphores_renderingIsOver(VkeApp::Base().SwapchainImageCount()) {
 		for (auto& i : fences)
-			i.Create(FLAGS(VK_FENCE_CREATE_SIGNALED_BIT));
+			i.Create(FLAGS{ VK_FENCE_CREATE_SIGNALED_BIT });
 		for (auto& i : semaphores_imageIsAvailable)
 			i.Create();
 		for (auto& i : semaphores_renderingIsOver)
@@ -349,7 +349,7 @@ public:
 			return;
 		}
 		StagingBuffer::Buffer_MainThread().BufferData(data);
-		VkeApp::Plus().CommandBuffer().Begin(FLAGS(VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT));
+		VkeApp::Plus().CommandBuffer().Begin(FLAGS{ VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT });
 		CmdCopyBuffer(StagingBuffer::Buffer_MainThread(), bufferMemory, BufferCopy{ 0, offset, data.size() });
 		VkeApp::Plus().ExecuteCommandBuffer();
 	}
@@ -366,7 +366,7 @@ public:
 			return;
 		}
 		StagingBuffer::Buffer_MainThread().BufferData({ srcStride * elementCount, pSrc });
-		VkeApp::Plus().CommandBuffer().Begin(FLAGS(VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT));
+		VkeApp::Plus().CommandBuffer().Begin(FLAGS{ VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT });
 		std::unique_ptr regions = std::make_unique<BufferCopy[]>(elementCount);
 		for (size_t i = 0; i < elementCount; i++)
 			regions[i] = { srcStride * i, dstStride * i + offset, elementSize };
@@ -762,7 +762,7 @@ public:
 		};
 		bool generateMipmap = mipLevelCount > 1;
 		bool blitMipLevel0 = image_copyTo != image_blitTo;
-		VkeApp::Plus().CommandBuffer().Begin(FLAGS(VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT));
+		VkeApp::Plus().CommandBuffer().Begin(FLAGS{ VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT });
 		ImageOperation::CmdCopyBufferToImage(buffer_copyFrom, image_copyTo, BufferImageCopy{}.
 			ImageSubresource({ VK_IMAGE_ASPECT_COLOR_BIT, 0, 0, layerCount }).
 			ImageExtent({ imageExtent.width, imageExtent.height, 1 }),
@@ -788,7 +788,7 @@ public:
 		bool generateMipmap = mipLevelCount > 1;
 		bool blitMipLevel0 = image_preinitialized != image_final;
 		if (generateMipmap || blitMipLevel0) {
-			VkeApp::Plus().CommandBuffer().Begin(FLAGS(VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT));
+			VkeApp::Plus().CommandBuffer().Begin(FLAGS{ VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT });
 			if (blitMipLevel0)
 				CmdPipelineBarrier(VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT, 0, {}, {}, ImageMemoryBarrier{}.
 					DstAccessMask(VK_ACCESS_TRANSFER_READ_BIT).
@@ -1226,7 +1226,7 @@ public:
 
 class PipelineStatisticQuery {
 protected:
-	enum StatisticName {
+	enum {
 		// Input Assembly
 		vertexCount_ia,
 		primitiveCount_ia,

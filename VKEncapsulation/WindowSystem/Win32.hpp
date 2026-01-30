@@ -2,8 +2,8 @@
 #define NOMINMAX
 #define VOLK_IMPLEMENTATION
 #include "Core/VKEncapsulation.h"
-#include <sstream>
 #include <chrono>
+#include <sstream>
 #ifndef NDEBUG
 #pragma comment(linker, "/subsystem:console")
 #define M_Main main() { WinMain(GetModuleHandle(0), 0, nullptr, 0); } int WinMain

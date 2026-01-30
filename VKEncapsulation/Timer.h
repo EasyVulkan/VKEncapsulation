@@ -1,6 +1,6 @@
-#include <iostream>
-#include <chrono>
 #include <format>
+#include <chrono>
+#include <iostream>
 
 class Timer {
 	using time_point = std::chrono::steady_clock::time_point;

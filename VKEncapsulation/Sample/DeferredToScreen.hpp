@@ -6,7 +6,6 @@
 #include M_VulkanSdkHeader(glm/glm.hpp)
 #include M_VulkanSdkHeader(glm/gtc/matrix_transform.hpp)
 #include M_VulkanSdkHeader(glm/gtc/quaternion.hpp)
-#include <iostream>
 
 struct Vertex {
 	glm::vec3 position;
@@ -272,7 +271,7 @@ int main() {
 	oop::Semaphore semaphore_renderingIsOver({});
 
 	oop::CommandBuffer commandBuffer;
-	oop::CommandPool commandPool({ FLAGS(VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT) });
+	oop::CommandPool commandPool(FLAGS{ VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT });
 	commandPool.AllocateBuffers(VK_COMMAND_BUFFER_LEVEL_PRIMARY, commandBuffer);
 
 	Vertex vertices[] = {
@@ -351,14 +350,14 @@ int main() {
 		TitleFps();
 
 		VkeApp::Base().SwapImage(semaphore_imageIsAvailable);
-		commandBuffer.Begin(FLAGS(VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT));
+		commandBuffer.Begin(FLAGS{ VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT });
 		DeferredToScreen::CmdBeginRendering();
 
 		CmdSetViewport(0, Viewport{ 0.f, 0.f, float(swapchainImageExtent.width), float(swapchainImageExtent.height), 0.f, 1.f });
 		CmdSetScissor(0, Rect2D{ {}, swapchainImageExtent });
 
 		// G-buffer
-		auto bufferInfo = DescriptorBufferInfo{}.Buffer(uniformBuffer).Range(sizeof(glm::mat4) * 2);
+		auto bufferInfo = DescriptorBufferInfo{ uniformBuffer, 0, sizeof(glm::mat4) * 2 };
 		CmdPushDescriptorSet(VK_PIPELINE_BIND_POINT_GRAPHICS, DeferredToScreen::pipelineLayout_gBuffer, 0, WriteDescriptorSet{}.
 			DescriptorType(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER).
 			BufferInfo(bufferInfo));

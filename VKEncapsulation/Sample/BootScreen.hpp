@@ -1,10 +1,8 @@
-#define VK_ENCAPSULATION_ALLOW_PASSING_TEMPORARY_ADDRESS_TO_SETTER
 #define VK_ENCAPSULATION_RESULT_THROW
 #include "WindowSystem/Glfw.hpp"
 #define STB_IMAGE_IMPLEMENTATION
 #include "Plus/AppBasePlus.h"
 #include "Timer.h"
-#include <iostream>
 #include <chrono>
 #include <thread>
 
@@ -25,7 +23,7 @@ void BootScreen(const char* imagePath, VK_ENCAPSULATION_NAMESPACE::Format imageF
 	oop::Fence fence({});
 
 	VkeApp::Base().SwapImage(semaphore_imageIsAvailable);
-	VkeApp::Plus().CommandBuffer().Begin(FLAGS(VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT));
+	VkeApp::Plus().CommandBuffer().Begin(FLAGS{ VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT });
 	Extent2D swapchainImageExtent = VkeApp::Base().SwapchainCreateInfo().imageExtent;
 	bool blit =
 		imageExtent.width != swapchainImageExtent.width ||
@@ -126,13 +124,13 @@ struct ToScreen {
 				Image(VkeApp::Base().SwapchainImage()).
 				SubresourceRange({ VK_IMAGE_ASPECT_COLOR_BIT, 0, 1, 0, 1 }));
 
+		auto colorAttachmentInfo = RenderingAttachmentInfo{}.
+			ImageView(VkeApp::Base().SwapchainImageView()).
+			ImageLayout(VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL).
+			ClearValue({});
 		vke::CmdBeginRendering(RenderingInfo{}.
 			RenderArea({ {}, swapchainImageExtent }).
-			ColorAttachments(
-				RenderingAttachmentInfo{}.
-					ImageView(VkeApp::Base().SwapchainImageView()).
-					ImageLayout(VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL).
-					ClearValue({})));
+			ColorAttachments(colorAttachmentInfo));
 	}
 	static void CmdEndRendering() {
 		vke::CmdEndRendering();
@@ -171,14 +169,14 @@ int main() {
 	oop::Semaphore semaphore_renderingIsOver({});
 
 	oop::CommandBuffer commandBuffer;
-	oop::CommandPool commandPool({ FLAGS(VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT) });
+	oop::CommandPool commandPool(FLAGS{ VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT });
 	commandPool.AllocateBuffers(VK_COMMAND_BUFFER_LEVEL_PRIMARY, commandBuffer);
 
 	while (!WindowShouldClose()) {
 		TitleFps();
 
 		VkeApp::Base().SwapImage(semaphore_imageIsAvailable);
-		commandBuffer.Begin(FLAGS(VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT));
+		commandBuffer.Begin(FLAGS{ VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT });
 		ToScreen::CmdBeginRendering();
 
 		CmdSetViewport(0, Viewport{ 0.f, 0.f, float(swapchainImageExtent.width), float(swapchainImageExtent.height), 0.f, 1.f });
