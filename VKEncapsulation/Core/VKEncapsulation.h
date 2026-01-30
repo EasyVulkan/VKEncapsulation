@@ -54,6 +54,7 @@
 
 #include "VKAppBase.h"
 #include "VKOop.h"
+#include "VKEnum.h"
 
 #ifdef VK_ENCAPSULATION_ALLOW_RAII_FUNCTIONS
 #undef AUTO

@@ -176,7 +176,7 @@ int main() {
 		TitleFps();
 
 		VkeApp::Base().SwapImage(semaphore_imageIsAvailable);
-		commandBuffer.Begin(FLAGS{ VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT });
+		commandBuffer.Begin(FLAGS{ VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT });
 		ToScreen::CmdBeginRendering();
 
 		CmdSetViewport(0, Viewport{ 0.f, 0.f, float(swapchainImageExtent.width), float(swapchainImageExtent.height), 0.f, 1.f });
