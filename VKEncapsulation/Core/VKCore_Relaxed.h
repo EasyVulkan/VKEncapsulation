@@ -86,8 +86,7 @@ __VA_ARGS__; ~_() { F(*this, *this); } }
 #define DefineRaiiFunction_ResultL(ResultT, F, InfoT, ArgT, arg, ...) inline AUTO F(ArgT arg __VA_ARGS__) { DefineFunctionRaiiClass_ResultL(ResultT, F, InfoT, decltype(arg)); return _{ arg }; }
 #define DefineRaiiFunction_ResultR(ResultT, F, ArgT, arg, InfoT)      inline AUTO F(ArgT arg) { DefineFunctionRaiiClass_ResultR(ResultT, F, InfoT, decltype(arg)); return _{ arg }; }
 #define DefineRaiiFunction_TwoStruct(F, T0, T1, ...)                  inline AUTO F() { DefineFunctionRaiiClass_TwoStruct(F, T0, T1, __VA_ARGS__); return _{}; }
-#define DefineSetter_Copy(F, T, var)                            constexpr auto& F(T const& var) { this->var = var; return *this; }
-#define DefineSetter_CopyOptional(F, T, var, sw, op)            constexpr auto& F(T const& var) { this->var = var; sw = op; return *this; }
+#define DefineSetter_Copy(F, T, var, ...)                       constexpr auto& F(T const& var) { this->var = var; __VA_ARGS__; return *this; }
 #define DefineSetter_ArrayCopy(F, T, var)                       constexpr auto& F(VK_ENCAPSULATION_NAMESPACE::ArrayRef<const T, false> var) { std::copy_n(var.data(), std::size(this->var), this->var); return *this; }
 #define DefineSetter_Ref(F, T, var)                             constexpr auto& F(OptionalRef<T> var) { p##F = &var; return *this; }
 #define DefineSetter_PointerAndRef(F, T, var)                   DefineSetter_Copy(P##F, T*, p##F); DefineSetter_Ref(F, T, var)
@@ -918,6 +917,7 @@ VK_ENCAPSULATION_STRUCTURE_BEGIN(BufferCreateInfo) {
 	DefineSetter_Copy(Size, VkDeviceSize, size);
 	DefineSetter_Copy(Usage, VkBufferUsageFlags, usage);
 	DefineSetter_Copy(SharingMode, VkSharingMode, sharingMode);
+	DefineSetter_Copy(QueueFamilyIndexCount, uint32_t, queueFamilyIndexCount, sharingMode = true);
 	DefineSetter_ArrayRef(QueueFamilyIndices, const uint32_t, queueFamilyIndices, queueFamilyIndexCount, sharingMode = VkSharingMode(bool(queueFamilyIndices)));
 };
 VK_ENCAPSULATION_STRUCTURE_END(BufferCreateInfo)
@@ -944,6 +944,7 @@ VK_ENCAPSULATION_STRUCTURE_BEGIN(ImageCreateInfo) {
 	DefineSetter_Copy(Tiling, VkImageTiling, tiling);
 	DefineSetter_Copy(Usage, VkImageUsageFlags, usage);
 	DefineSetter_Copy(SharingMode, VkSharingMode, sharingMode);
+	DefineSetter_Copy(QueueFamilyIndexCount, uint32_t, queueFamilyIndexCount, sharingMode = true);
 	DefineSetter_ArrayRef(QueueFamilyIndices, const uint32_t, queueFamilyIndices, queueFamilyIndexCount, sharingMode = VkSharingMode(bool(queueFamilyIndices)));
 	DefineSetter_Copy(InitialLayout, VkImageLayout, initialLayout);
 };
@@ -1110,9 +1111,9 @@ VK_ENCAPSULATION_STRUCTURE_BEGIN(PipelineRasterizationStateCreateInfo) {
 	DefineSetter_Copy(CullMode, VkCullModeFlags, cullMode);
 	DefineSetter_Copy(FrontFace, VkFrontFace, frontFace);
 	DefineSetter_Copy(DepthBiasEnable, VkBool32, depthBiasEnable);
-	DefineSetter_CopyOptional(DepthBiasConstantFactor, float, depthBiasConstantFactor, depthBiasEnable, true);
+	DefineSetter_Copy(DepthBiasConstantFactor, float, depthBiasConstantFactor, depthBiasEnable = true);
 	DefineSetter_Copy(DepthBiasClamp, float, depthBiasClamp);
-	DefineSetter_CopyOptional(DepthBiasSlopeFactor, float, depthBiasSlopeFactor, depthBiasEnable, true);
+	DefineSetter_Copy(DepthBiasSlopeFactor, float, depthBiasSlopeFactor, depthBiasEnable = true);
 	DefineSetter_Copy(LineWidth, float, lineWidth);
 };
 VK_ENCAPSULATION_STRUCTURE_END(PipelineRasterizationStateCreateInfo)
@@ -1122,7 +1123,7 @@ VK_ENCAPSULATION_STRUCTURE_BEGIN(PipelineMultisampleStateCreateInfo) {
 	DefineSetter_Copy(Flags, VkPipelineMultisampleStateCreateFlags, flags);
 	DefineSetter_Copy(RasterizationSamples, VkSampleCountFlagBits, rasterizationSamples);
 	DefineSetter_Copy(SampleShadingEnable, VkBool32, sampleShadingEnable);
-	DefineSetter_CopyOptional(MinSampleShading, float, minSampleShading, sampleShadingEnable, true);
+	DefineSetter_Copy(MinSampleShading, float, minSampleShading, sampleShadingEnable = true);
 	DefineSetter_ArrayRefIgnoreC(SampleMask, const VkSampleMask, sampleMask);
 	DefineSetter_Copy(AlphaToCoverageEnable, VkBool32, alphaToCoverageEnable);
 	DefineSetter_Copy(AlphaToOneEnable, VkBool32, alphaToOneEnable);
@@ -1146,24 +1147,24 @@ VK_ENCAPSULATION_STRUCTURE_BEGIN(PipelineDepthStencilStateCreateInfo) {
 	DefineSetter_Copy(Flags, VkPipelineDepthStencilStateCreateFlags, flags);
 	DefineSetter_Copy(DepthTestEnable, VkBool32, depthTestEnable);
 	DefineSetter_Copy(DepthWriteEnable, VkBool32, depthWriteEnable);
-	DefineSetter_CopyOptional(DepthCompareOp, VkCompareOp, depthCompareOp, depthTestEnable, true);
+	DefineSetter_Copy(DepthCompareOp, VkCompareOp, depthCompareOp, depthTestEnable = true);
 	DefineSetter_Copy(DepthBoundsTestEnable, VkBool32, depthBoundsTestEnable);
 	DefineSetter_Copy(StencilTestEnable, VkBool32, stencilTestEnable);
-	DefineSetter_CopyOptional(Front, VkStencilOpState, front, stencilTestEnable, true);
-	DefineSetter_CopyOptional(Back, VkStencilOpState, back, stencilTestEnable, true);
-	DefineSetter_CopyOptional(MinDepthBounds, float, minDepthBounds, depthBoundsTestEnable, true);
-	DefineSetter_CopyOptional(MaxDepthBounds, float, maxDepthBounds, depthBoundsTestEnable, true);
+	DefineSetter_Copy(Front, VkStencilOpState, front, stencilTestEnable = true);
+	DefineSetter_Copy(Back, VkStencilOpState, back, stencilTestEnable = true);
+	DefineSetter_Copy(MinDepthBounds, float, minDepthBounds, depthBoundsTestEnable = true);
+	DefineSetter_Copy(MaxDepthBounds, float, maxDepthBounds, depthBoundsTestEnable = true);
 };
 VK_ENCAPSULATION_STRUCTURE_END(PipelineDepthStencilStateCreateInfo)
 
 VK_ENCAPSULATION_STRUCTURE_BEGIN_NO_STYPE(PipelineColorBlendAttachmentState) {
 	StructureClassHeader_NoSType(PipelineColorBlendAttachmentState, .colorWriteMask = 0b1111);
 	DefineSetter_Copy(BlendEnable, VkBool32, blendEnable);
-	DefineSetter_CopyOptional(SrcColorBlendFactor, VkBlendFactor, srcColorBlendFactor, blendEnable, true);
-	DefineSetter_CopyOptional(DstColorBlendFactor, VkBlendFactor, dstColorBlendFactor, blendEnable, true);
+	DefineSetter_Copy(SrcColorBlendFactor, VkBlendFactor, srcColorBlendFactor, blendEnable = true);
+	DefineSetter_Copy(DstColorBlendFactor, VkBlendFactor, dstColorBlendFactor, blendEnable = true);
 	DefineSetter_Copy(ColorBlendOp, VkBlendOp, colorBlendOp);
-	DefineSetter_CopyOptional(SrcAlphaBlendFactor, VkBlendFactor, srcAlphaBlendFactor, blendEnable, true);
-	DefineSetter_CopyOptional(DstAlphaBlendFactor, VkBlendFactor, dstAlphaBlendFactor, blendEnable, true);
+	DefineSetter_Copy(SrcAlphaBlendFactor, VkBlendFactor, srcAlphaBlendFactor, blendEnable = true);
+	DefineSetter_Copy(DstAlphaBlendFactor, VkBlendFactor, dstAlphaBlendFactor, blendEnable = true);
 	DefineSetter_Copy(AlphaBlendOp, VkBlendOp, alphaBlendOp);
 	DefineSetter_Copy(ColorWriteMask, VkColorComponentFlags, colorWriteMask);
 };
@@ -1173,7 +1174,7 @@ VK_ENCAPSULATION_STRUCTURE_BEGIN(PipelineColorBlendStateCreateInfo) {
 	StructureClassHeader(PipelineColorBlendStateCreateInfo);
 	DefineSetter_Copy(Flags, VkPipelineColorBlendStateCreateFlags, flags);
 	DefineSetter_Copy(LogicOpEnable, VkBool32, logicOpEnable);
-	DefineSetter_CopyOptional(LogicOp, VkLogicOp, logicOp, logicOpEnable, true);
+	DefineSetter_Copy(LogicOp, VkLogicOp, logicOp, logicOpEnable = true);
 	DefineSetter_Copy(AttachmentCount, uint32_t, attachmentCount);
 	DefineSetter_ArrayRef(Attachments, const VkPipelineColorBlendAttachmentState, attachments, attachmentCount);
 	// float blendConstants[4];
@@ -1240,9 +1241,9 @@ VK_ENCAPSULATION_STRUCTURE_BEGIN(SamplerCreateInfo) {
 	DefineSetter_Copy(AddressModeW, VkSamplerAddressMode, addressModeW);
 	DefineSetter_Copy(MipLodBias, float, mipLodBias);
 	DefineSetter_Copy(AnisotropyEnable, VkBool32, anisotropyEnable);
-	DefineSetter_CopyOptional(MaxAnisotropy, float, maxAnisotropy, anisotropyEnable, true);
+	DefineSetter_Copy(MaxAnisotropy, float, maxAnisotropy, anisotropyEnable = true);
 	DefineSetter_Copy(CompareEnable, VkBool32, compareEnable);
-	DefineSetter_CopyOptional(CompareOp, VkCompareOp, compareOp, compareEnable, true);
+	DefineSetter_Copy(CompareOp, VkCompareOp, compareOp, compareEnable = true);
 	DefineSetter_Copy(MinLod, float, minLod);
 	DefineSetter_Copy(MaxLod, float, maxLod);
 	DefineSetter_Copy(BorderColor, VkBorderColor, borderColor);
@@ -1427,7 +1428,7 @@ VK_ENCAPSULATION_STRUCTURE_BEGIN(CommandBufferInheritanceInfo) {
 	DefineSetter_Copy(Subpass, uint32_t, subpass);
 	DefineSetter_Copy(Framebuffer, VkFramebuffer, framebuffer);
 	DefineSetter_Copy(OcclusionQueryEnable, VkBool32, occlusionQueryEnable);
-	DefineSetter_CopyOptional(QueryFlags, VkQueryControlFlags, queryFlags, occlusionQueryEnable, true);
+	DefineSetter_Copy(QueryFlags, VkQueryControlFlags, queryFlags, occlusionQueryEnable = true);
 	DefineSetter_Copy(PipelineStatistics, VkQueryPipelineStatisticFlags, pipelineStatistics);
 };
 VK_ENCAPSULATION_STRUCTURE_END(CommandBufferInheritanceInfo)
@@ -3691,7 +3692,7 @@ VK_ENCAPSULATION_STRUCTURE_BEGIN(RenderingAttachmentInfo) {
 	DefineSetter_Copy(ResolveImageLayout, VkImageLayout, resolveImageLayout);
 	DefineSetter_Copy(LoadOp, VkAttachmentLoadOp, loadOp);
 	DefineSetter_Copy(StoreOp, VkAttachmentStoreOp, storeOp);
-	DefineSetter_CopyOptional(ClearValue, VkClearValue, clearValue, loadOp, VK_ATTACHMENT_LOAD_OP_CLEAR);
+	DefineSetter_Copy(ClearValue, VkClearValue, clearValue, loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR);
 };
 VK_ENCAPSULATION_STRUCTURE_END(RenderingAttachmentInfo)
 
@@ -4020,7 +4021,7 @@ VK_ENCAPSULATION_STRUCTURE_BEGIN(PipelineRasterizationLineStateCreateInfo) {
 	StructureClassHeader(PipelineRasterizationLineStateCreateInfo);
 	DefineSetter_Copy(LineRasterizationMode, VkLineRasterizationMode, lineRasterizationMode);
 	DefineSetter_Copy(StippledLineEnable, VkBool32, stippledLineEnable);
-	DefineSetter_CopyOptional(LineStippleFactor, uint32_t, lineStippleFactor, stippledLineEnable, true);
+	DefineSetter_Copy(LineStippleFactor, uint32_t, lineStippleFactor, stippledLineEnable = true);
 	DefineSetter_Copy(LineStipplePattern, uint16_t, lineStipplePattern);
 };
 VK_ENCAPSULATION_STRUCTURE_END(PipelineRasterizationLineStateCreateInfo)
@@ -4488,6 +4489,7 @@ VK_ENCAPSULATION_STRUCTURE_BEGIN(SwapchainCreateInfoKHR) {
 	DefineSetter_Copy(ImageArrayLayers, uint32_t, imageArrayLayers);
 	DefineSetter_Copy(ImageUsage, VkImageUsageFlags, imageUsage);
 	DefineSetter_Copy(ImageSharingMode, VkSharingMode, imageSharingMode);
+	DefineSetter_Copy(QueueFamilyIndexCount, uint32_t, queueFamilyIndexCount, imageSharingMode = true);
 	DefineSetter_ArrayRef(QueueFamilyIndices, const uint32_t, queueFamilyIndices, queueFamilyIndexCount, imageSharingMode = VkSharingMode(bool(queueFamilyIndices)));
 	DefineSetter_Copy(PreTransform, VkSurfaceTransformFlagBitsKHR, preTransform);
 	DefineSetter_Copy(CompositeAlpha, VkCompositeAlphaFlagBitsKHR, compositeAlpha);
@@ -5028,7 +5030,7 @@ VK_ENCAPSULATION_STRUCTURE_END(VideoEncodeH264QualityLevelPropertiesKHR)
 VK_ENCAPSULATION_STRUCTURE_BEGIN(VideoEncodeH264SessionCreateInfoKHR) {
 	StructureClassHeader(VideoEncodeH264SessionCreateInfoKHR);
 	DefineSetter_Copy(UseMaxLevelIdc, VkBool32, useMaxLevelIdc);
-	DefineSetter_CopyOptional(MaxLevelIdc, StdVideoH264LevelIdc, maxLevelIdc, useMaxLevelIdc, true);
+	DefineSetter_Copy(MaxLevelIdc, StdVideoH264LevelIdc, maxLevelIdc, useMaxLevelIdc = true);
 };
 VK_ENCAPSULATION_STRUCTURE_END(VideoEncodeH264SessionCreateInfoKHR)
 
@@ -5053,8 +5055,8 @@ VK_ENCAPSULATION_STRUCTURE_BEGIN(VideoEncodeH264SessionParametersGetInfoKHR) {
 	StructureClassHeader(VideoEncodeH264SessionParametersGetInfoKHR);
 	DefineSetter_Copy(WriteStdSPS, VkBool32, writeStdSPS);
 	DefineSetter_Copy(WriteStdPPS, VkBool32, writeStdPPS);
-	DefineSetter_CopyOptional(StdSPSId, uint32_t, stdSPSId, writeStdSPS, true);
-	DefineSetter_CopyOptional(StdPPSId, uint32_t, stdPPSId, writeStdPPS, true);
+	DefineSetter_Copy(StdSPSId, uint32_t, stdSPSId, writeStdSPS = true);
+	DefineSetter_Copy(StdPPSId, uint32_t, stdPPSId, writeStdPPS = true);
 };
 VK_ENCAPSULATION_STRUCTURE_END(VideoEncodeH264SessionParametersGetInfoKHR)
 
@@ -5112,20 +5114,20 @@ VK_ENCAPSULATION_STRUCTURE_END(VideoEncodeH264FrameSizeKHR)
 VK_ENCAPSULATION_STRUCTURE_BEGIN(VideoEncodeH264RateControlLayerInfoKHR) {
 	StructureClassHeader(VideoEncodeH264RateControlLayerInfoKHR);
 	DefineSetter_Copy(UseMinQp, VkBool32, useMinQp);
-	DefineSetter_CopyOptional(MinQp, VkVideoEncodeH264QpKHR, minQp, useMinQp, true);
+	DefineSetter_Copy(MinQp, VkVideoEncodeH264QpKHR, minQp, useMinQp = true);
 	DefineSetter_Copy(UseMaxQp, VkBool32, useMaxQp);
-	DefineSetter_CopyOptional(MaxQp, VkVideoEncodeH264QpKHR, maxQp, useMaxQp, true);
+	DefineSetter_Copy(MaxQp, VkVideoEncodeH264QpKHR, maxQp, useMaxQp = true);
 	DefineSetter_Copy(UseMaxFrameSize, VkBool32, useMaxFrameSize);
-	DefineSetter_CopyOptional(MaxFrameSize, VkVideoEncodeH264FrameSizeKHR, maxFrameSize, useMaxFrameSize, true);
+	DefineSetter_Copy(MaxFrameSize, VkVideoEncodeH264FrameSizeKHR, maxFrameSize, useMaxFrameSize = true);
 };
 VK_ENCAPSULATION_STRUCTURE_END(VideoEncodeH264RateControlLayerInfoKHR)
 
 VK_ENCAPSULATION_STRUCTURE_BEGIN(VideoEncodeH264GopRemainingFrameInfoKHR) {
 	StructureClassHeader(VideoEncodeH264GopRemainingFrameInfoKHR);
 	DefineSetter_Copy(UseGopRemainingFrames, VkBool32, useGopRemainingFrames);
-	DefineSetter_CopyOptional(GopRemainingI, uint32_t, gopRemainingI, useGopRemainingFrames, true);
-	DefineSetter_CopyOptional(GopRemainingP, uint32_t, gopRemainingP, useGopRemainingFrames, true);
-	DefineSetter_CopyOptional(GopRemainingB, uint32_t, gopRemainingB, useGopRemainingFrames, true);
+	DefineSetter_Copy(GopRemainingI, uint32_t, gopRemainingI, useGopRemainingFrames = true);
+	DefineSetter_Copy(GopRemainingP, uint32_t, gopRemainingP, useGopRemainingFrames = true);
+	DefineSetter_Copy(GopRemainingB, uint32_t, gopRemainingB, useGopRemainingFrames = true);
 };
 VK_ENCAPSULATION_STRUCTURE_END(VideoEncodeH264GopRemainingFrameInfoKHR)
 
@@ -5140,7 +5142,7 @@ VK_ENCAPSULATION_STRUCTURE_END(VideoEncodeH265CapabilitiesKHR)
 VK_ENCAPSULATION_STRUCTURE_BEGIN(VideoEncodeH265SessionCreateInfoKHR) {
 	StructureClassHeader(VideoEncodeH265SessionCreateInfoKHR);
 	DefineSetter_Copy(UseMaxLevelIdc, VkBool32, useMaxLevelIdc);
-	DefineSetter_CopyOptional(MaxLevelIdc, StdVideoH265LevelIdc, maxLevelIdc, useMaxLevelIdc, true);
+	DefineSetter_Copy(MaxLevelIdc, StdVideoH265LevelIdc, maxLevelIdc, useMaxLevelIdc = true);
 };
 VK_ENCAPSULATION_STRUCTURE_END(VideoEncodeH265SessionCreateInfoKHR)
 
@@ -5182,9 +5184,9 @@ VK_ENCAPSULATION_STRUCTURE_BEGIN(VideoEncodeH265SessionParametersGetInfoKHR) {
 	DefineSetter_Copy(WriteStdVPS, VkBool32, writeStdVPS);
 	DefineSetter_Copy(WriteStdSPS, VkBool32, writeStdSPS);
 	DefineSetter_Copy(WriteStdPPS, VkBool32, writeStdPPS);
-	DefineSetter_CopyOptional(StdVPSId, uint32_t, stdVPSId, writeStdVPS, true);
-	DefineSetter_CopyOptional(StdSPSId, uint32_t, stdSPSId, writeStdSPS, true);
-	DefineSetter_CopyOptional(StdPPSId, uint32_t, stdPPSId, writeStdPPS, true);
+	DefineSetter_Copy(StdVPSId, uint32_t, stdVPSId, writeStdVPS = true);
+	DefineSetter_Copy(StdSPSId, uint32_t, stdSPSId, writeStdSPS = true);
+	DefineSetter_Copy(StdPPSId, uint32_t, stdPPSId, writeStdPPS = true);
 };
 VK_ENCAPSULATION_STRUCTURE_END(VideoEncodeH265SessionParametersGetInfoKHR)
 
@@ -5241,20 +5243,20 @@ VK_ENCAPSULATION_STRUCTURE_END(VideoEncodeH265FrameSizeKHR)
 VK_ENCAPSULATION_STRUCTURE_BEGIN(VideoEncodeH265RateControlLayerInfoKHR) {
 	StructureClassHeader(VideoEncodeH265RateControlLayerInfoKHR);
 	DefineSetter_Copy(UseMinQp, VkBool32, useMinQp);
-	DefineSetter_CopyOptional(MinQp, VkVideoEncodeH265QpKHR, minQp, useMinQp, true);
+	DefineSetter_Copy(MinQp, VkVideoEncodeH265QpKHR, minQp, useMinQp = true);
 	DefineSetter_Copy(UseMaxQp, VkBool32, useMaxQp);
-	DefineSetter_CopyOptional(MaxQp, VkVideoEncodeH265QpKHR, maxQp, useMaxQp, true);
+	DefineSetter_Copy(MaxQp, VkVideoEncodeH265QpKHR, maxQp, useMaxQp = true);
 	DefineSetter_Copy(UseMaxFrameSize, VkBool32, useMaxFrameSize);
-	DefineSetter_CopyOptional(MaxFrameSize, VkVideoEncodeH265FrameSizeKHR, maxFrameSize, useMaxFrameSize, true);
+	DefineSetter_Copy(MaxFrameSize, VkVideoEncodeH265FrameSizeKHR, maxFrameSize, useMaxFrameSize = true);
 };
 VK_ENCAPSULATION_STRUCTURE_END(VideoEncodeH265RateControlLayerInfoKHR)
 
 VK_ENCAPSULATION_STRUCTURE_BEGIN(VideoEncodeH265GopRemainingFrameInfoKHR) {
 	StructureClassHeader(VideoEncodeH265GopRemainingFrameInfoKHR);
 	DefineSetter_Copy(UseGopRemainingFrames, VkBool32, useGopRemainingFrames);
-	DefineSetter_CopyOptional(GopRemainingI, uint32_t, gopRemainingI, useGopRemainingFrames, true);
-	DefineSetter_CopyOptional(GopRemainingP, uint32_t, gopRemainingP, useGopRemainingFrames, true);
-	DefineSetter_CopyOptional(GopRemainingB, uint32_t, gopRemainingB, useGopRemainingFrames, true);
+	DefineSetter_Copy(GopRemainingI, uint32_t, gopRemainingI, useGopRemainingFrames = true);
+	DefineSetter_Copy(GopRemainingP, uint32_t, gopRemainingP, useGopRemainingFrames = true);
+	DefineSetter_Copy(GopRemainingB, uint32_t, gopRemainingB, useGopRemainingFrames = true);
 };
 VK_ENCAPSULATION_STRUCTURE_END(VideoEncodeH265GopRemainingFrameInfoKHR)
 
@@ -6799,7 +6801,7 @@ VK_ENCAPSULATION_STRUCTURE_END(VideoEncodeAV1QualityLevelPropertiesKHR)
 VK_ENCAPSULATION_STRUCTURE_BEGIN(VideoEncodeAV1SessionCreateInfoKHR) {
 	StructureClassHeader(VideoEncodeAV1SessionCreateInfoKHR);
 	DefineSetter_Copy(UseMaxLevel, VkBool32, useMaxLevel);
-	DefineSetter_CopyOptional(MaxLevel, StdVideoAV1Level, maxLevel, useMaxLevel, true);
+	DefineSetter_Copy(MaxLevel, StdVideoAV1Level, maxLevel, useMaxLevel = true);
 };
 VK_ENCAPSULATION_STRUCTURE_END(VideoEncodeAV1SessionCreateInfoKHR)
 
@@ -6848,9 +6850,9 @@ VK_ENCAPSULATION_STRUCTURE_END(VideoEncodeAV1FrameSizeKHR)
 VK_ENCAPSULATION_STRUCTURE_BEGIN(VideoEncodeAV1GopRemainingFrameInfoKHR) {
 	StructureClassHeader(VideoEncodeAV1GopRemainingFrameInfoKHR);
 	DefineSetter_Copy(UseGopRemainingFrames, VkBool32, useGopRemainingFrames);
-	DefineSetter_CopyOptional(GopRemainingIntra, uint32_t, gopRemainingIntra, useGopRemainingFrames, true);
-	DefineSetter_CopyOptional(GopRemainingPredictive, uint32_t, gopRemainingPredictive, useGopRemainingFrames, true);
-	DefineSetter_CopyOptional(GopRemainingBipredictive, uint32_t, gopRemainingBipredictive, useGopRemainingFrames, true);
+	DefineSetter_Copy(GopRemainingIntra, uint32_t, gopRemainingIntra, useGopRemainingFrames = true);
+	DefineSetter_Copy(GopRemainingPredictive, uint32_t, gopRemainingPredictive, useGopRemainingFrames = true);
+	DefineSetter_Copy(GopRemainingBipredictive, uint32_t, gopRemainingBipredictive, useGopRemainingFrames = true);
 };
 VK_ENCAPSULATION_STRUCTURE_END(VideoEncodeAV1GopRemainingFrameInfoKHR)
 
@@ -6867,11 +6869,11 @@ VK_ENCAPSULATION_STRUCTURE_END(VideoEncodeAV1RateControlInfoKHR)
 VK_ENCAPSULATION_STRUCTURE_BEGIN(VideoEncodeAV1RateControlLayerInfoKHR) {
 	StructureClassHeader(VideoEncodeAV1RateControlLayerInfoKHR);
 	DefineSetter_Copy(UseMinQIndex, VkBool32, useMinQIndex);
-	DefineSetter_CopyOptional(MinQIndex, VkVideoEncodeAV1QIndexKHR, minQIndex, useMinQIndex, true);
+	DefineSetter_Copy(MinQIndex, VkVideoEncodeAV1QIndexKHR, minQIndex, useMinQIndex = true);
 	DefineSetter_Copy(UseMaxQIndex, VkBool32, useMaxQIndex);
-	DefineSetter_CopyOptional(MaxQIndex, VkVideoEncodeAV1QIndexKHR, maxQIndex, useMaxQIndex, true);
+	DefineSetter_Copy(MaxQIndex, VkVideoEncodeAV1QIndexKHR, maxQIndex, useMaxQIndex = true);
 	DefineSetter_Copy(UseMaxFrameSize, VkBool32, useMaxFrameSize);
-	DefineSetter_CopyOptional(MaxFrameSize, VkVideoEncodeAV1FrameSizeKHR, maxFrameSize, useMaxFrameSize, true);
+	DefineSetter_Copy(MaxFrameSize, VkVideoEncodeAV1FrameSizeKHR, maxFrameSize, useMaxFrameSize = true);
 };
 VK_ENCAPSULATION_STRUCTURE_END(VideoEncodeAV1RateControlLayerInfoKHR)
 
@@ -7627,7 +7629,7 @@ VK_ENCAPSULATION_STRUCTURE_END(ViewportWScalingNV)
 VK_ENCAPSULATION_STRUCTURE_BEGIN(PipelineViewportWScalingStateCreateInfoNV) {
 	StructureClassHeader(PipelineViewportWScalingStateCreateInfoNV);
 	DefineSetter_Copy(ViewportWScalingEnable, VkBool32, viewportWScalingEnable);
-	DefineSetter_CopyOptional(ViewportCount, uint32_t, viewportCount, viewportWScalingEnable, true);
+	DefineSetter_Copy(ViewportCount, uint32_t, viewportCount, viewportWScalingEnable = true);
 	// If the viewport W scaling state is dynamic, pViewportWScalings is ignored.
 	DefineSetter_ArrayRef(ViewportWScalings, const VkViewportWScalingNV, viewportWScalings, viewportCount, viewportWScalingEnable = bool(viewportWScalings));
 };
@@ -7752,7 +7754,7 @@ VK_ENCAPSULATION_STRUCTURE_END(PhysicalDeviceMultiviewPerViewAttributesPropertie
 VK_ENCAPSULATION_STRUCTURE_BEGIN(MultiviewPerViewAttributesInfoNVX) {
 	StructureClassHeader(MultiviewPerViewAttributesInfoNVX);
 	DefineSetter_Copy(PerViewAttributes, VkBool32, perViewAttributes);
-	DefineSetter_CopyOptional(PerViewAttributesPositionXOnly, VkBool32, perViewAttributesPositionXOnly, perViewAttributes, true);
+	DefineSetter_Copy(PerViewAttributesPositionXOnly, VkBool32, perViewAttributesPositionXOnly, perViewAttributes = true);
 };
 VK_ENCAPSULATION_STRUCTURE_END(MultiviewPerViewAttributesInfoNVX)
 
@@ -8015,7 +8017,7 @@ VK_ENCAPSULATION_STRUCTURE_END(RenderPassSampleLocationsBeginInfoEXT)
 VK_ENCAPSULATION_STRUCTURE_BEGIN(PipelineSampleLocationsStateCreateInfoEXT) {
 	StructureClassHeader(PipelineSampleLocationsStateCreateInfoEXT);
 	DefineSetter_Copy(SampleLocationsEnable, VkBool32, sampleLocationsEnable);
-	DefineSetter_CopyOptional(SampleLocationsInfo, VkSampleLocationsInfoEXT, sampleLocationsInfo, sampleLocationsEnable, true);
+	DefineSetter_Copy(SampleLocationsInfo, VkSampleLocationsInfoEXT, sampleLocationsInfo, sampleLocationsEnable = true);
 };
 VK_ENCAPSULATION_STRUCTURE_END(PipelineSampleLocationsStateCreateInfoEXT)
 
@@ -8063,7 +8065,7 @@ VK_ENCAPSULATION_STRUCTURE_BEGIN(PipelineCoverageToColorStateCreateInfoNV) {
 	StructureClassHeader(PipelineCoverageToColorStateCreateInfoNV);
 	DefineSetter_Copy(Flags, VkPipelineCoverageToColorStateCreateFlagsNV, flags);
 	DefineSetter_Copy(CoverageToColorEnable, VkBool32, coverageToColorEnable);
-	DefineSetter_CopyOptional(CoverageToColorLocation, uint32_t, coverageToColorLocation, coverageToColorEnable, true);
+	DefineSetter_Copy(CoverageToColorLocation, uint32_t, coverageToColorLocation, coverageToColorEnable = true);
 };
 VK_ENCAPSULATION_STRUCTURE_END(PipelineCoverageToColorStateCreateInfoNV)
 
@@ -8072,6 +8074,7 @@ VK_ENCAPSULATION_STRUCTURE_BEGIN(PipelineCoverageModulationStateCreateInfoNV) {
 	DefineSetter_Copy(Flags, VkPipelineCoverageModulationStateCreateFlagsNV, flags);
 	DefineSetter_Copy(CoverageModulationMode, VkCoverageModulationModeNV, coverageModulationMode);
 	DefineSetter_Copy(CoverageModulationTableEnable, VkBool32, coverageModulationTableEnable);
+	DefineSetter_Copy(CoverageModulationTableCount, uint32_t, coverageModulationTableCount, coverageModulationTableEnable = true);
 	DefineSetter_ArrayRef(CoverageModulationTable, const float, coverageModulationTable, coverageModulationTableCount, coverageModulationTableEnable = bool(coverageModulationTable));
 };
 VK_ENCAPSULATION_STRUCTURE_END(PipelineCoverageModulationStateCreateInfoNV)
@@ -8105,6 +8108,7 @@ VK_ENCAPSULATION_STRUCTURE_BEGIN(PhysicalDeviceImageDrmFormatModifierInfoEXT) {
 	StructureClassHeader(PhysicalDeviceImageDrmFormatModifierInfoEXT);
 	DefineSetter_Copy(DrmFormatModifier, uint64_t, drmFormatModifier);
 	DefineSetter_Copy(SharingMode, VkSharingMode, sharingMode);
+	DefineSetter_Copy(QueueFamilyIndexCount, uint32_t, queueFamilyIndexCount, sharingMode = true);
 	DefineSetter_ArrayRef(QueueFamilyIndices, const uint32_t, queueFamilyIndices, queueFamilyIndexCount, sharingMode = VkSharingMode(bool(queueFamilyIndices)));
 };
 VK_ENCAPSULATION_STRUCTURE_END(PhysicalDeviceImageDrmFormatModifierInfoEXT)
@@ -8200,7 +8204,7 @@ VK_ENCAPSULATION_STRUCTURE_END(ShadingRatePaletteNV)
 VK_ENCAPSULATION_STRUCTURE_BEGIN(PipelineViewportShadingRateImageStateCreateInfoNV) {
 	StructureClassHeader(PipelineViewportShadingRateImageStateCreateInfoNV);
 	DefineSetter_Copy(ShadingRateImageEnable, VkBool32, shadingRateImageEnable);
-	DefineSetter_CopyOptional(ViewportCount, uint32_t, viewportCount, shadingRateImageEnable, true);
+	DefineSetter_Copy(ViewportCount, uint32_t, viewportCount, shadingRateImageEnable = true);
 	// If the shading rate palette state is dynamic, pShadingRatePalettes is ignored.
 	DefineSetter_ArrayRef(ShadingRatePalettes, const VkShadingRatePaletteNV, shadingRatePalettes, viewportCount, shadingRateImageEnable = bool(shadingRatePalettes));
 };
@@ -8715,7 +8719,7 @@ VK_ENCAPSULATION_STRUCTURE_BEGIN(PerformanceOverrideInfoINTEL) {
 	StructureClassHeader(PerformanceOverrideInfoINTEL);
 	DefineSetter_Copy(Type, VkPerformanceOverrideTypeINTEL, type);
 	DefineSetter_Copy(Enable, VkBool32, enable);
-	DefineSetter_CopyOptional(Parameter, uint64_t, parameter, enable, true);
+	DefineSetter_Copy(Parameter, uint64_t, parameter, enable = true);
 };
 VK_ENCAPSULATION_STRUCTURE_END(PerformanceOverrideInfoINTEL)
 
@@ -9267,6 +9271,7 @@ VK_ENCAPSULATION_STRUCTURE_END(PhysicalDeviceInheritedViewportScissorFeaturesNV)
 VK_ENCAPSULATION_STRUCTURE_BEGIN(CommandBufferInheritanceViewportScissorInfoNV) {
 	StructureClassHeader(CommandBufferInheritanceViewportScissorInfoNV);
 	DefineSetter_Copy(ViewportScissor2D, VkBool32, viewportScissor2D);
+	DefineSetter_Copy(ViewportDepthCount, uint32_t, viewportDepthCount, viewportScissor2D = true);
 	DefineSetter_ArrayRef(ViewportDepths, const VkViewport, viewportDepths, viewportDepthCount, viewportScissor2D = bool(viewportDepths));
 };
 VK_ENCAPSULATION_STRUCTURE_END(CommandBufferInheritanceViewportScissorInfoNV)
@@ -10082,7 +10087,7 @@ VK_ENCAPSULATION_STRUCTURE_END(SubpassResolvePerformanceQueryEXT)
 VK_ENCAPSULATION_STRUCTURE_BEGIN(MultisampledRenderToSingleSampledInfoEXT) {
 	StructureClassHeader(MultisampledRenderToSingleSampledInfoEXT);
 	DefineSetter_Copy(MultisampledRenderToSingleSampledEnable, VkBool32, multisampledRenderToSingleSampledEnable);
-	DefineSetter_CopyOptional(RasterizationSamples, VkSampleCountFlagBits, rasterizationSamples, multisampledRenderToSingleSampledEnable, true);
+	DefineSetter_Copy(RasterizationSamples, VkSampleCountFlagBits, rasterizationSamples, multisampledRenderToSingleSampledEnable = true);
 };
 VK_ENCAPSULATION_STRUCTURE_END(MultisampledRenderToSingleSampledInfoEXT)
 
@@ -10937,6 +10942,7 @@ VK_ENCAPSULATION_STRUCTURE_BEGIN(TensorCreateInfoARM) {
 	DefineSetter_Copy(Flags, VkTensorCreateFlagsARM, flags);
 	DefineSetter_Ref(Description, const VkTensorDescriptionARM, description);
 	DefineSetter_Copy(SharingMode, VkSharingMode, sharingMode);
+	DefineSetter_Copy(QueueFamilyIndexCount, uint32_t, queueFamilyIndexCount, sharingMode = true);
 	DefineSetter_ArrayRef(QueueFamilyIndices, const uint32_t, queueFamilyIndices, queueFamilyIndexCount, sharingMode = VkSharingMode(bool(queueFamilyIndices)));
 };
 VK_ENCAPSULATION_STRUCTURE_END(TensorCreateInfoARM)
@@ -15047,7 +15053,6 @@ VK_ENCAPSULATION_NAMESPACE_END
 #undef DefineRaiiFunction_ResultR
 #undef DefineRaiiFunction_TwoStruct
 #undef DefineSetter_Copy
-#undef DefineSetter_CopyOptional
 #undef DefineSetter_ArrayCopy
 #undef DefineSetter_Ref
 #undef DefineSetter_PointerAndRef

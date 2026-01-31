@@ -3,24 +3,21 @@
 #define VK_ENCAPSULATION_OOP_EXTENDED_BEGIN(T) template<> struct VK_ENCAPSULATION_NAMESPACE::oop::Extended<VK_ENCAPSULATION_NAMESPACE::oop::T> : public VK_ENCAPSULATION_NAMESPACE::oop::T
 
 #define ParameterList(...) , __VA_ARGS__
-#define DefineFunctionRaiiClass(ObjT, F, InfoT, Pars, Set, ...)                                   using PT = decltype(this); class _ : Structure<Vk##InfoT, true> { PT pObj; public: _(PT pObj Pars) : pObj(pObj) { Set; } ~_() { pObj->F(reinterpret_cast<InfoT&&>(*this)); } using Structure::AddNextStructure; DefineSetter_Copy(PNext, decltype(_::pNext), pNext) __VA_ARGS__ };
-#define DefineFunctionRaiiClass_L(ObjT, F, InfoT, Pars, ArgT, arg, Set, ...)                      using PT = decltype(this); class _ : Structure<Vk##InfoT, true> { PT pObj; ArgT arg; public: _(PT pObj Pars, ArgT arg) : pObj(pObj), arg(arg) { Set; } ~_() { pObj->F(reinterpret_cast<InfoT&&>(*this), arg); } using Structure::AddNextStructure; DefineSetter_Copy(PNext, decltype(_::pNext), pNext) __VA_ARGS__ };
+#define DefineFunctionRaiiClass(ObjT, F, InfoT, Pars, Set, ...)                                   using PT = decltype(this); class _ : Structure<Vk##InfoT, true> { PT pObj; public: _(PT pObj Pars) : pObj(pObj) { Set; } ~_() { pObj->F(reinterpret_cast<InfoT&&>(*this)); } using Structure::AddNextStructure; DefineSetter_Decltype(PNext, pNext) __VA_ARGS__ };
+#define DefineFunctionRaiiClass_L(ObjT, F, InfoT, Pars, ArgT, arg, Set, ...)                      using PT = decltype(this); class _ : Structure<Vk##InfoT, true> { PT pObj; ArgT arg; public: _(PT pObj Pars, ArgT arg) : pObj(pObj), arg(arg) { Set; } ~_() { pObj->F(reinterpret_cast<InfoT&&>(*this), arg); } using Structure::AddNextStructure; DefineSetter_Decltype(PNext, pNext) __VA_ARGS__ };
 #define DefineFunctionRaiiClass_TwoStruct(ObjT, F, T0, T1, Pars, Set, ...)                        using PT = decltype(this); class _ : Structure<Vk##T0, true>, Structure<Vk##T1, true> { PT pObj; public: using T0 = Structure<Vk##T0, true>; using T1 = Structure<Vk##T1, true>; using T0::ArrayRef; using T0::OptionalRef; _(PT pObj Pars) : pObj(pObj) { Set; }\
 auto& PNextOf##T0(decltype(T0::pNext) pNext) { T0::pNext = pNext; return *this; } auto& AddNextStructureTo##T0(STypeStructureRef<true> next, bool allowDuplicate = false, OptionalRef<VkBaseOutStructure**> ppBack = {}) { T0::AddNextStructure(next, allowDuplicate, ppBack); return *this; }\
 auto& PNextOf##T1(decltype(T1::pNext) pNext) { T1::pNext = pNext; return *this; } auto& AddNextStructureTo##T1(STypeStructureRef<true> next, bool allowDuplicate = false, OptionalRef<VkBaseOutStructure**> ppBack = {}) { T1::AddNextStructure(next, allowDuplicate, ppBack); return *this; }\
 ~_() { pObj->F(reinterpret_cast<Structure<Vk##T0, false>&&>(static_cast<T0&>(*this)), reinterpret_cast<Structure<Vk##T1, false>&&>(static_cast<T1&>(*this))); } __VA_ARGS__ }
-#define DefineFunctionRaiiClass_Result(ObjT, ResultT, F, InfoT, Pars, Set, ...)                   using PT = decltype(this); class _ : Structure<Vk##InfoT, true> { PT pObj; public: _(PT pObj Pars) : pObj(pObj) { Set; } ~_() { ResultT(*this); } using Structure::AddNextStructure; DefineSetter_Copy(PNext, decltype(_::pNext), pNext) __VA_ARGS__ \
+#define DefineFunctionRaiiClass_Result(ObjT, ResultT, F, InfoT, Pars, Set, ...)                   using PT = decltype(this); class _ : Structure<Vk##InfoT, true> { PT pObj; public: _(PT pObj Pars) : pObj(pObj) { Set; } ~_() { ResultT(*this); } using Structure::AddNextStructure; DefineSetter_Decltype(PNext, pNext) __VA_ARGS__ \
 operator ResultT() { if (this->sType == VK_STRUCTURE_TYPE_MAX_ENUM) return VK_SUCCESS; Native_T<ResultT> result = pObj->F(reinterpret_cast<InfoT&&>(*this)); this->sType = VK_STRUCTURE_TYPE_MAX_ENUM; return result; } };
-#define DefineFunctionRaiiClass_ResultL(ObjT, ResultT, F, InfoT, Pars, ArgT, arg, Set, ...)       using PT = decltype(this); class _ : Structure<Vk##InfoT, true> { PT pObj; ArgT arg; public: _(PT pObj Pars, ArgT arg) : pObj(pObj), arg(arg) { Set; } ~_() { ResultT(*this); } using Structure::AddNextStructure; DefineSetter_Copy(PNext, decltype(_::pNext), pNext) __VA_ARGS__ \
+#define DefineFunctionRaiiClass_ResultL(ObjT, ResultT, F, InfoT, Pars, ArgT, arg, Set, ...)       using PT = decltype(this); class _ : Structure<Vk##InfoT, true> { PT pObj; ArgT arg; public: _(PT pObj Pars, ArgT arg) : pObj(pObj), arg(arg) { Set; } ~_() { ResultT(*this); } using Structure::AddNextStructure; DefineSetter_Decltype(PNext, pNext) __VA_ARGS__ \
 operator ResultT() { if (this->sType == VK_STRUCTURE_TYPE_MAX_ENUM) return VK_SUCCESS; Native_T<ResultT> result = pObj->F(reinterpret_cast<InfoT&&>(*this), arg); this->sType = VK_STRUCTURE_TYPE_MAX_ENUM; return result; } };
-#define DefineFunctionRaiiClass_ResultR(ObjT, ResultT, F, ArgT, arg, InfoT, Pars, Set, ...)       using PT = decltype(this); class _ : Structure<Vk##InfoT, true> { PT pObj; ArgT arg; public: _(PT pObj, ArgT arg Pars) : pObj(pObj), arg(arg) { Set; } ~_() { ResultT(*this); } using Structure::AddNextStructure; DefineSetter_Copy(PNext, decltype(_::pNext), pNext) __VA_ARGS__ \
+#define DefineFunctionRaiiClass_ResultR(ObjT, ResultT, F, ArgT, arg, InfoT, Pars, Set, ...)       using PT = decltype(this); class _ : Structure<Vk##InfoT, true> { PT pObj; ArgT arg; public: _(PT pObj, ArgT arg Pars) : pObj(pObj), arg(arg) { Set; } ~_() { ResultT(*this); } using Structure::AddNextStructure; DefineSetter_Decltype(PNext, pNext) __VA_ARGS__ \
 operator ResultT() { if (this->sType == VK_STRUCTURE_TYPE_MAX_ENUM) return VK_SUCCESS; Native_T<ResultT> result = pObj->F(arg, reinterpret_cast<InfoT&&>(*this)); this->sType = VK_STRUCTURE_TYPE_MAX_ENUM; return result; } };
-#define DefineFunctionRaiiClass_ResultPublic(ObjT, ResultT, F, InfoT)                             using PT = decltype(this); class _ : public Structure<Vk##InfoT, true> { PT pObj; public: _(PT pObj) : pObj(pObj) {} ~_() { ResultT(*this); }\
-operator ResultT() { if (this->sType == VK_STRUCTURE_TYPE_MAX_ENUM) return VK_SUCCESS; Native_T<ResultT> result = pObj->F(reinterpret_cast<InfoT&&>(*this)); this->sType = VK_STRUCTURE_TYPE_MAX_ENUM; return result; } };
-#define DefineFunctionRaiiClass_ResultPublicR(ObjT, ResultT, F, ArgT, arg, InfoT, Pars, Set, ...) using PT = decltype(this); class _ : public Structure<Vk##InfoT, true> { PT pObj; ArgT arg; public: _(PT pObj, ArgT arg Pars) : pObj(pObj), arg(arg) { Set; } ~_() { ResultT(*this); }\
-operator ResultT() { if (this->sType == VK_STRUCTURE_TYPE_MAX_ENUM) return VK_SUCCESS; Native_T<ResultT> result = pObj->F(arg, reinterpret_cast<InfoT&&>(*this)); this->sType = VK_STRUCTURE_TYPE_MAX_ENUM; return result; } };
-#define DefineSetter_Copy(F, T, var)            auto& F(Ref<const T> var) { this->var = var; return *this; }
-#define DefineSetter_ArrayRef(F, T, var, count) auto& F(ArrayRef<T> var) { count = var.size(); p##F = var; return *this; }
+#define DefineSetter_Decltype(F, var, ...)           auto& F(Ref<const decltype(_::var)> var) { this->var = var; __VA_ARGS__; return *this; }
+#define DefineSetter_Ref(F, T, var)                  auto& F(OptionalRef<T> var) { p##F = &var; return *this; }
+#define DefineSetter_ArrayRef(F, T, var, count, ...) auto& F(ArrayRef<T> var) { count = var.size(); p##F = var; __VA_ARGS__; return *this; }
 #define ObjectClassHeader(T) using Base_T = raii::Object<Vk##T>; public: Object() = default; Extended<T>* operator->() { return reinterpret_cast<Extended<T>*>(this); } const Extended<T>* operator->() const { return reinterpret_cast<const Extended<T>*>(this); }
 
 VK_ENCAPSULATION_OOP_NAMESPACE_BEGIN
@@ -189,11 +186,15 @@ VK_ENCAPSULATION_OOP_OBJECT_BEGIN(Buffer) {
 			Size(size).
 			Usage(usage).
 			QueueFamilyIndices(queueFamilyIndices),
-			DefineSetter_Copy(Flags, decltype(_::flags), flags));
+			DefineSetter_Decltype(Flags, flags));
 		return _{ this, size, usage, queueFamilyIndices };
 	}
 	AUTO   Create() {
-		DefineFunctionRaiiClass_ResultPublic(Buffer, RESULT, Create, BufferCreateInfo);
+		DefineFunctionRaiiClass_Result(Buffer, RESULT, Create, BufferCreateInfo, , ,
+			DefineSetter_Decltype(Flags, flags)
+			DefineSetter_Decltype(Size, size)
+			DefineSetter_Decltype(Usage, usage)
+			DefineSetter_ArrayRef(QueueFamilyIndices, const uint32_t, queueFamilyIndices, queueFamilyIndexCount, sharingMode = SharingMode_(bool(queueFamilyIndices))));
 		return _{ this };
 	}
 };
@@ -374,7 +375,7 @@ VK_ENCAPSULATION_OOP_OBJECT_BEGIN(Image) {
 			DstImage(dstImage).
 			DstImageLayout(dstImageLayout).
 			Regions(regions),
-			DefineSetter_Copy(Flags, decltype(_::flags), flags));
+			DefineSetter_Decltype(Flags, flags));
 		return _{ this, srcImageLayout, dstImage, dstImageLayout, regions };
 	}
 	RESULT CopyToMemory(const CopyImageToMemoryInfo& copyImageToMemoryInfo) const {
@@ -387,7 +388,7 @@ VK_ENCAPSULATION_OOP_OBJECT_BEGIN(Image) {
 			CopyImageToMemoryInfo, ParameterList(ImageLayout srcImageLayout, ArrayRef<const ImageToMemoryCopy> regions),
 			SrcImageLayout(srcImageLayout).
 			Regions(regions),
-			DefineSetter_Copy(Flags, decltype(_::flags), flags));
+			DefineSetter_Decltype(Flags, flags));
 		return _{ this, srcImageLayout, regions };
 	}
 	RESULT CopyFromMemory(const CopyMemoryToImageInfo& copyMemoryToImageInfo) const {
@@ -400,7 +401,7 @@ VK_ENCAPSULATION_OOP_OBJECT_BEGIN(Image) {
 			CopyMemoryToImageInfo, ParameterList(ImageLayout dstImageLayout, ArrayRef<const MemoryToImageCopy> regions),
 			DstImageLayout(dstImageLayout).
 			Regions(regions),
-			DefineSetter_Copy(Flags, decltype(_::flags), flags));
+			DefineSetter_Decltype(Flags, flags));
 		return _{ this, dstImageLayout, regions };
 	}
 	RESULT TransitionLayout(const HostImageLayoutTransitionInfo& transition) const {
@@ -460,11 +461,22 @@ VK_ENCAPSULATION_OOP_OBJECT_BEGIN(Image) {
 			Usage(usage).
 			QueueFamilyIndices(queueFamilyIndices).
 			InitialLayout(initialLayout),
-			DefineSetter_Copy(Flags, decltype(_::flags), flags));
+			DefineSetter_Decltype(Flags, flags));
 		return _{ this, imageType, format, extent, mipLevels, arrayLayers, samples, tiling, usage, queueFamilyIndices, initialLayout };
 	}
 	AUTO   Create() {
-		DefineFunctionRaiiClass_ResultPublic(Image, RESULT, Create, ImageCreateInfo);
+		DefineFunctionRaiiClass_Result(Image, RESULT, Create, ImageCreateInfo, , ,
+			DefineSetter_Decltype(Flags, flags)
+			DefineSetter_Decltype(ImageType, imageType)
+			DefineSetter_Decltype(Format, format)
+			DefineSetter_Decltype(Extent, extent)
+			DefineSetter_Decltype(MipLevels, mipLevels)
+			DefineSetter_Decltype(ArrayLayers, arrayLayers)
+			DefineSetter_Decltype(Samples, samples)
+			DefineSetter_Decltype(Tiling, tiling)
+			DefineSetter_Decltype(Usage, usage)
+			DefineSetter_ArrayRef(QueueFamilyIndices, const uint32_t, queueFamilyIndices, queueFamilyIndexCount, sharingMode = SharingMode_(bool(queueFamilyIndices)))
+			DefineSetter_Decltype(InitialLayout, initialLayout));
 		return _{ this };
 	}
 };
@@ -539,7 +551,7 @@ VK_ENCAPSULATION_OOP_OBJECT_BEGIN(Queue) {
 			WaitSemaphoreInfos(waitSemaphoreInfos).
 			CommandBufferInfos(commandBufferInfos).
 			SignalSemaphoreInfos(signalSemaphoreInfos),
-			DefineSetter_Copy(Flags, decltype(_::flags), flags));
+			DefineSetter_Decltype(Flags, flags));
 		return _{ this, waitSemaphoreInfos, commandBufferInfos, signalSemaphoreInfos, fence };
 	}
 	/* Non-const Function */
@@ -555,14 +567,14 @@ VK_ENCAPSULATION_OOP_OBJECT_BEGIN(Queue) {
 			DeviceQueueInfo2, ParameterList(uint32_t queueFamilyIndex, uint32_t queueIndex),
 			QueueFamilyIndex(queueFamilyIndex).
 			QueueIndex(queueFamilyIndex),
-			DefineSetter_Copy(Flags, decltype(_::flags), flags));
+			DefineSetter_Decltype(Flags, flags));
 		return _{ this, queueFamilyIndex, queueFamilyIndex };
 	}
 	AUTO Get2() {
 		DefineFunctionRaiiClass(Queue, Get2, DeviceQueueInfo2, , ,
-			DefineSetter_Copy(Flags, decltype(_::flags), flags)
-			DefineSetter_Copy(QueueFamilyIndex, uint32_t, queueFamilyIndex)
-			DefineSetter_Copy(QueueIndex, uint32_t, queueIndex));
+			DefineSetter_Decltype(Flags, flags)
+			DefineSetter_Decltype(QueueFamilyIndex, queueFamilyIndex)
+			DefineSetter_Decltype(QueueIndex, queueIndex));
 		return _{ this };
 	}
 };
@@ -603,7 +615,7 @@ VK_ENCAPSULATION_OOP_OBJECT_BEGIN(Semaphore) {
 			SemaphoreWaitInfo, ParameterList(uint64_t value),
 			uint64_t, timeout,
 			Values(value),
-			DefineSetter_Copy(Flags, decltype(_::flags), flags));
+			DefineSetter_Decltype(Flags, flags));
 		return _{ this, value, timeout };
 	}
 	RESULT Signal(const SemaphoreSignalInfo& signalInfo) {
@@ -629,7 +641,7 @@ VK_ENCAPSULATION_OOP_OBJECT_BEGIN(Semaphore) {
 	}
 	AUTO   Create() {
 		DefineFunctionRaiiClass_Result(Semaphore, RESULT, Create, SemaphoreCreateInfo, , ,
-			DefineSetter_Copy(Flags, decltype(_::flags), flags));
+			DefineSetter_Decltype(Flags, flags));
 		return _{ this };
 	}
 	// ======== For timeline semaphore
@@ -659,7 +671,7 @@ VK_ENCAPSULATION_OOP_OBJECT_BEGIN(CommandBuffer) {
 		DefineFunctionRaiiClass_Result(CommandBuffer, RESULT, Begin,
 			CommandBufferBeginInfo, ParameterList(OptionalRef<const CommandBufferInheritanceInfo> inheritanceInfo),
 			InheritanceInfo(inheritanceInfo),
-			DefineSetter_Copy(Flags, decltype(_::flags), flags));
+			DefineSetter_Decltype(Flags, flags));
 		return _{ this, inheritanceInfo };
 	}
 	RESULT End() const {
@@ -717,7 +729,7 @@ VK_ENCAPSULATION_OOP_OBJECT_BEGIN(Fence) {
 	}
 	AUTO   Create() {
 		DefineFunctionRaiiClass_Result(Fence, RESULT, Create, FenceCreateInfo, , ,
-			DefineSetter_Copy(Flags, decltype(_::flags), flags));
+			DefineSetter_Decltype(Flags, flags));
 		return _{ this };
 	}
 };
@@ -780,7 +792,7 @@ VK_ENCAPSULATION_OOP_OBJECT_BEGIN(DeviceMemory) {
 			void*&, pData,
 			Offset(offset).
 			Size(size),
-			DefineSetter_Copy(Flags, decltype(_::flags), flags));
+			DefineSetter_Decltype(Flags, flags));
 		return _{ this, offset, size, pData };
 	}
 	RESULT Unmap2(const MemoryUnmapInfo& memoryUnmapInfo) const {
@@ -790,7 +802,7 @@ VK_ENCAPSULATION_OOP_OBJECT_BEGIN(DeviceMemory) {
 	}
 	AUTO   Unmap2() const {
 		DefineFunctionRaiiClass_Result(DeviceMemory, RESULT, Unmap2, MemoryUnmapInfo, , ,
-			DefineSetter_Copy(Flags, decltype(_::flags), flags));
+			DefineSetter_Decltype(Flags, flags));
 		return _{ this };
 	}
 	// ======== Encapsulation for common usage
@@ -847,7 +859,9 @@ VK_ENCAPSULATION_OOP_OBJECT_BEGIN(DeviceMemory) {
 		return _{ this, allocationSize, memoryTypeIndex };
 	}
 	AUTO   Allocate() {
-		DefineFunctionRaiiClass_ResultPublic(DeviceMemory, RESULT, Allocate, MemoryAllocateInfo);
+		DefineFunctionRaiiClass_Result(DeviceMemory, RESULT, Allocate, MemoryAllocateInfo, , ,
+			DefineSetter_Decltype(AllocationSize, allocationSize)
+			DefineSetter_Decltype(MemoryTypeIndex, memoryTypeIndex));
 		return _{ this };
 	}
 protected:
@@ -920,7 +934,7 @@ VK_ENCAPSULATION_OOP_OBJECT_BEGIN(Event) {
 			MemoryBarriers(memoryBarriers).
 			BufferMemoryBarriers(bufferMemoryBarriers).
 			ImageMemoryBarriers(imageMemoryBarriers),
-			DefineSetter_Copy(DependencyFlags, decltype(_::dependencyFlags), dependencyFlags));
+			DefineSetter_Decltype(DependencyFlags, dependencyFlags));
 		return _{ this, memoryBarriers, bufferMemoryBarriers, imageMemoryBarriers };
 	}
 	void CmdReset2(PipelineStageFlags2 stageMask) const {
@@ -935,7 +949,7 @@ VK_ENCAPSULATION_OOP_OBJECT_BEGIN(Event) {
 			MemoryBarriers(memoryBarriers).
 			BufferMemoryBarriers(bufferMemoryBarriers).
 			ImageMemoryBarriers(imageMemoryBarriers),
-			DefineSetter_Copy(DependencyFlags, decltype(_::dependencyFlags), dependencyFlags));
+			DefineSetter_Decltype(DependencyFlags, dependencyFlags));
 		return _{ this, memoryBarriers, bufferMemoryBarriers, imageMemoryBarriers };
 	}
 	/* Non-const Function */
@@ -946,7 +960,8 @@ VK_ENCAPSULATION_OOP_OBJECT_BEGIN(Event) {
 		return result;
 	}
 	AUTO   Create() {
-		DefineFunctionRaiiClass_Result(Event, RESULT, Create, EventCreateInfo, , , DefineSetter_Copy(Flags, decltype(_::flags), flags));
+		DefineFunctionRaiiClass_Result(Event, RESULT, Create, EventCreateInfo, , ,
+			DefineSetter_Decltype(Flags, flags));
 		return _{ this };
 	}
 };
@@ -1008,11 +1023,15 @@ VK_ENCAPSULATION_OOP_OBJECT_BEGIN(QueryPool) {
 			QueryType(queryType).
 			QueryCount(queryCount).
 			PipelineStatistics(pipelineStatistics),
-			DefineSetter_Copy(Flags, decltype(_::flags), flags));
+			DefineSetter_Decltype(Flags, flags));
 		return _{ this, queryType, queryCount, pipelineStatistics };
 	}
 	AUTO   Create() {
-		DefineFunctionRaiiClass_ResultPublic(QueryPool, RESULT, Create, QueryPoolCreateInfo);
+		DefineFunctionRaiiClass_Result(QueryPool, RESULT, Create, QueryPoolCreateInfo, , ,
+			DefineSetter_Decltype(Flags, flags)
+			DefineSetter_Decltype(QueryType, queryType)
+			DefineSetter_Decltype(QueryCount, queryCount)
+			DefineSetter_Decltype(PipelineStatistics, pipelineStatistics));
 		return _{ this };
 	}
 };
@@ -1040,11 +1059,16 @@ VK_ENCAPSULATION_OOP_OBJECT_BEGIN(BufferView) {
 			Format(format).
 			Offset(offset).
 			Range(range),
-			DefineSetter_Copy(Flags, decltype(_::flags), flags));
+			DefineSetter_Decltype(Flags, flags));
 		return _{ this, buffer, format, offset, range };
 	}
 	AUTO   Create() {
-		DefineFunctionRaiiClass_ResultPublic(BufferView, RESULT, Create, BufferViewCreateInfo);
+		DefineFunctionRaiiClass_Result(BufferView, RESULT, Create, BufferViewCreateInfo, , ,
+			DefineSetter_Decltype(Flags, flags)
+			DefineSetter_Decltype(Buffer, buffer)
+			DefineSetter_Decltype(Format, format)
+			DefineSetter_Decltype(Offset, offset)
+			DefineSetter_Decltype(Range, range));
 		return _{ this };
 	}
 };
@@ -1073,11 +1097,17 @@ VK_ENCAPSULATION_OOP_OBJECT_BEGIN(ImageView) {
 			Format(format).
 			Components(components).
 			SubresourceRange(subresourceRange),
-			DefineSetter_Copy(Flags, decltype(_::flags), flags));
+			DefineSetter_Decltype(Flags, flags));
 		return _{ this, image, viewType, format, components, subresourceRange };
 	}
 	AUTO   Create() {
-		DefineFunctionRaiiClass_ResultPublic(ImageView, RESULT, Create, ImageViewCreateInfo);
+		DefineFunctionRaiiClass_Result(ImageView, RESULT, Create, ImageViewCreateInfo, , ,
+			DefineSetter_Decltype(Flags, flags)
+			DefineSetter_Decltype(Image, image)
+			DefineSetter_Decltype(ViewType, viewType)
+			DefineSetter_Decltype(Format, format)
+			DefineSetter_Decltype(Components, components)
+			DefineSetter_Decltype(SubresourceRange, subresourceRange));
 		return _{ this };
 	}
 };
@@ -1111,15 +1141,18 @@ VK_ENCAPSULATION_OOP_OBJECT_BEGIN(ShaderModule) {
 		DefineFunctionRaiiClass_Result(ShaderModule, RESULT, Create,
 			ShaderModuleCreateInfo, ParameterList(ArrayRef<const uint32_t> code),
 			Code(code),
-			DefineSetter_Copy(Flags, decltype(_::flags), flags));
+			DefineSetter_Decltype(Flags, flags));
 		return _{ this, code };
 	}
 	AUTO   Create() {
-		DefineFunctionRaiiClass_ResultPublic(ShaderModule, RESULT, Create, ShaderModuleCreateInfo);
+		DefineFunctionRaiiClass_Result(ShaderModule, RESULT, Create, ShaderModuleCreateInfo, , ,
+			DefineSetter_Decltype(Flags, flags)
+			auto& Code(ArrayRef<const uint32_t> code) { codeSize = 4 * code.size(); pCode = code; return *this; });
 		return _{ this };
 	}
 	AUTO   Create(const char* filepath) {
-		DefineFunctionRaiiClass_ResultL(ShaderModule, RESULT, Create_Internal, ShaderModuleCreateInfo, , const char*, filepath, , DefineSetter_Copy(Flags, decltype(_::flags), flags));
+		DefineFunctionRaiiClass_ResultL(ShaderModule, RESULT, Create_Internal, ShaderModuleCreateInfo, , const char*, filepath, ,
+			DefineSetter_Decltype(Flags, flags));
 		return _{ this, filepath };
 	}
 protected:
@@ -1174,14 +1207,16 @@ VK_ENCAPSULATION_OOP_OBJECT_BEGIN(PipelineCache) {
 		DefineFunctionRaiiClass_Result(PipelineCache, RESULT, Create,
 			PipelineCacheCreateInfo, ParameterList(ArrayRef<const void> initialData),
 			InitialData(initialData),
-			DefineSetter_Copy(Flags, decltype(_::flags), flags));
+			DefineSetter_Decltype(Flags, flags));
 		return _{ this, initialData };
 	}
 	AUTO   Create(const IsNotRangeOrPointer auto& initialData) requires(!std::convertible_to<decltype(initialData), PipelineCacheCreateInfo>) {
 		return Create({ sizeof *&initialData, &initialData });
 	}
 	AUTO   Create() {
-		DefineFunctionRaiiClass_ResultPublic(PipelineCache, RESULT, Create, PipelineCacheCreateInfo);
+		DefineFunctionRaiiClass_Result(PipelineCache, RESULT, Create, PipelineCacheCreateInfo, , ,
+			DefineSetter_Decltype(Flags, flags)
+			DefineSetter_ArrayRef(InitialData, const void, initialData, initialDataSize));
 		return _{ this };
 	}
 };
@@ -1207,11 +1242,14 @@ VK_ENCAPSULATION_OOP_OBJECT_BEGIN(PipelineLayout) {
 			PipelineLayoutCreateInfo, ParameterList(ArrayRef<const DescriptorSetLayout_> setLayouts, ArrayRef<const PushConstantRange> pushConstantRanges),
 			SetLayouts(setLayouts).
 			PushConstantRanges(pushConstantRanges),
-			DefineSetter_Copy(Flags, decltype(_::flags), flags));
+			DefineSetter_Decltype(Flags, flags));
 		return _{ this, setLayouts, pushConstantRanges };
 	}
 	AUTO   Create() {
-		DefineFunctionRaiiClass_ResultPublic(PipelineLayout, RESULT, Create, PipelineLayoutCreateInfo);
+		DefineFunctionRaiiClass_Result(PipelineLayout, RESULT, Create, PipelineLayoutCreateInfo, , ,
+			DefineSetter_Decltype(Flags, flags)
+			DefineSetter_ArrayRef(SetLayouts, const DescriptorSetLayout_, setLayouts, setLayoutCount)
+			DefineSetter_ArrayRef(PushConstantRanges, const PushConstantRange, pushConstantRanges, pushConstantRangeCount));
 		return _{ this };
 	}
 };
@@ -1267,11 +1305,27 @@ VK_ENCAPSULATION_OOP_OBJECT_BEGIN(Pipeline) {
 			Subpass(subpass).
 			BasePipelineHandle(basePipelineHandle).
 			BasePipelineIndex(basePipelineIndex),
-			DefineSetter_Copy(Flags, decltype(_::flags), flags));
+			DefineSetter_Decltype(Flags, flags));
 		return _{ this, pipelineCache, stages, vertexInputState, inputAssemblyState, tessellationState, viewportState, rasterizationState, multisampleState, depthStencilState, colorBlendState, dynamicState, layout, renderPass, subpass, basePipelineHandle, basePipelineIndex };
 	}
 	AUTO   CreateGraphics(PipelineCache_ pipelineCache = VK_NULL_HANDLE) {
-		DefineFunctionRaiiClass_ResultPublicR(Pipeline, RESULT, CreateGraphics, PipelineCache_, pipelineCache, GraphicsPipelineCreateInfo, , );
+		DefineFunctionRaiiClass_ResultR(Pipeline, RESULT, CreateGraphics, PipelineCache_, pipelineCache, GraphicsPipelineCreateInfo, , ,
+			DefineSetter_Decltype(Flags, flags)
+			DefineSetter_ArrayRef(Stages, const VkPipelineShaderStageCreateInfo, stages, stageCount)
+			DefineSetter_Ref(VertexInputState, const VkPipelineVertexInputStateCreateInfo, vertexInputState)
+			DefineSetter_Ref(InputAssemblyState, const VkPipelineInputAssemblyStateCreateInfo, inputAssemblyState)
+			DefineSetter_Ref(TessellationState, const VkPipelineTessellationStateCreateInfo, tessellationState)
+			DefineSetter_Ref(ViewportState, const VkPipelineViewportStateCreateInfo, viewportState)
+			DefineSetter_Ref(RasterizationState, const VkPipelineRasterizationStateCreateInfo, rasterizationState)
+			DefineSetter_Ref(MultisampleState, const VkPipelineMultisampleStateCreateInfo, multisampleState)
+			DefineSetter_Ref(DepthStencilState, const VkPipelineDepthStencilStateCreateInfo, depthStencilState)
+			DefineSetter_Ref(ColorBlendState, const VkPipelineColorBlendStateCreateInfo, colorBlendState)
+			DefineSetter_Ref(DynamicState, const VkPipelineDynamicStateCreateInfo, dynamicState)
+			DefineSetter_Decltype(Layout, layout)
+			DefineSetter_Decltype(RenderPass, renderPass)
+			DefineSetter_Decltype(Subpass, subpass)
+			DefineSetter_Decltype(BasePipelineHandle, basePipelineHandle)
+			DefineSetter_Decltype(BasePipelineIndex, basePipelineIndex));
 		return _{ this, pipelineCache };
 	}
 	RESULT CreateCompute(PipelineCache_ pipelineCache, const ComputePipelineCreateInfo& createInfo) {
@@ -1287,11 +1341,16 @@ VK_ENCAPSULATION_OOP_OBJECT_BEGIN(Pipeline) {
 			Layout(layout).
 			BasePipelineHandle(basePipelineHandle).
 			BasePipelineIndex(basePipelineIndex),
-			DefineSetter_Copy(Flags, decltype(_::flags), flags));
+			DefineSetter_Decltype(Flags, flags));
 		return _{ this, pipelineCache, stage, layout, basePipelineHandle, basePipelineIndex };
 	}
 	AUTO   CreateCompute(PipelineCache_ pipelineCache = VK_NULL_HANDLE) {
-		DefineFunctionRaiiClass_ResultPublicR(Pipeline, RESULT, CreateCompute, PipelineCache_, pipelineCache, ComputePipelineCreateInfo, , );
+		DefineFunctionRaiiClass_ResultR(Pipeline, RESULT, CreateCompute, PipelineCache_, pipelineCache, ComputePipelineCreateInfo, , ,
+			DefineSetter_Decltype(Flags, flags)
+			DefineSetter_Decltype(Stage, stage)
+			DefineSetter_Decltype(Layout, layout)
+			DefineSetter_Decltype(BasePipelineHandle, basePipelineHandle)
+			DefineSetter_Decltype(BasePipelineIndex, basePipelineIndex));
 		return _{ this, pipelineCache };
 	}
 };
@@ -1356,11 +1415,15 @@ VK_ENCAPSULATION_OOP_OBJECT_BEGIN(RenderPass) {
 			Attachments(attachments).
 			Subpasses(subpasses).
 			Dependencies(dependencies),
-			DefineSetter_Copy(Flags, decltype(_::flags), flags));
+			DefineSetter_Decltype(Flags, flags));
 		return _{ this, attachments, subpasses, dependencies };
 	}
 	AUTO   Create() {
-		DefineFunctionRaiiClass_ResultPublic(RenderPass, RESULT, Create, RenderPassCreateInfo);
+		DefineFunctionRaiiClass_Result(RenderPass, RESULT, Create, RenderPassCreateInfo, , ,
+			DefineSetter_Decltype(Flags, flags)
+			DefineSetter_ArrayRef(Attachments, const AttachmentDescription, attachments, attachmentCount)
+			DefineSetter_ArrayRef(Subpasses, const SubpassDescription, subpasses, subpassCount)
+			DefineSetter_ArrayRef(Dependencies, const SubpassDependency, dependencies, dependencyCount));
 		return _{ this };
 	}
 	// Provided by VK_API_VERSION_1_2 or VK_KHR_create_renderpass2
@@ -1377,11 +1440,16 @@ VK_ENCAPSULATION_OOP_OBJECT_BEGIN(RenderPass) {
 			Subpasses(subpasses).
 			Dependencies(dependencies).
 			CorrelatedViewMasks(CorrelatedViewMasks),
-			DefineSetter_Copy(Flags, decltype(_::flags), flags));
+			DefineSetter_Decltype(Flags, flags));
 		return _{ this, attachments, subpasses, dependencies, CorrelatedViewMasks };
 	}
 	AUTO   Create2() {
-		DefineFunctionRaiiClass_ResultPublic(RenderPass, RESULT, Create2, RenderPassCreateInfo2);
+		DefineFunctionRaiiClass_Result(RenderPass, RESULT, Create2, RenderPassCreateInfo2, , ,
+			DefineSetter_Decltype(Flags, flags)
+			DefineSetter_ArrayRef(Attachments, const AttachmentDescription2, attachments, attachmentCount)
+			DefineSetter_ArrayRef(Subpasses, const SubpassDescription2, subpasses, subpassCount)
+			DefineSetter_ArrayRef(Dependencies, const SubpassDependency2, dependencies, dependencyCount)
+			DefineSetter_ArrayRef(CorrelatedViewMasks, const uint32_t, correlatedViewMasks, correlatedViewMaskCount));
 		return _{ this };
 	}
 };
@@ -1406,11 +1474,13 @@ VK_ENCAPSULATION_OOP_OBJECT_BEGIN(DescriptorSetLayout) {
 		DefineFunctionRaiiClass_Result(DescriptorSetLayout, RESULT, Create,
 			DescriptorSetLayoutCreateInfo, ParameterList(ArrayRef<const DescriptorSetLayoutBinding> bindings),
 			Bindings(bindings),
-			DefineSetter_Copy(Flags, decltype(_::flags), flags));
+			DefineSetter_Decltype(Flags, flags));
 		return _{ this, bindings };
 	}
 	AUTO   Create() {
-		DefineFunctionRaiiClass_ResultPublic(DescriptorSetLayout, RESULT, Create, DescriptorSetLayoutCreateInfo);
+		DefineFunctionRaiiClass_Result(DescriptorSetLayout, RESULT, Create, DescriptorSetLayoutCreateInfo, , ,
+			DefineSetter_Decltype(Flags, flags)
+			DefineSetter_ArrayRef(Bindings, const DescriptorSetLayoutBinding, bindings, bindingCount));
 		return _{ this };
 	}
 };
@@ -1450,11 +1520,25 @@ VK_ENCAPSULATION_OOP_OBJECT_BEGIN(Sampler) {
 			MaxLod(maxLod).
 			BorderColor(borderColor).
 			UnnormalizedCoordinates(unnormalizedCoordinates),
-			DefineSetter_Copy(Flags, decltype(_::flags), flags));
+			DefineSetter_Decltype(Flags, flags));
 		return _{ this, magFilter, minFilter, mipmapMode, addressModeU, addressModeV, addressModeW, mipLodBias, maxAnisotropy, compareOp, minLod, maxLod, borderColor, unnormalizedCoordinates };
 	};
 	AUTO   Create() {
-		DefineFunctionRaiiClass_ResultPublic(Sampler, RESULT, Create, SamplerCreateInfo);
+		DefineFunctionRaiiClass_Result(Sampler, RESULT, Create, SamplerCreateInfo, , ,
+			DefineSetter_Decltype(Flags, flags)
+			DefineSetter_Decltype(MagFilter,  magFilter)
+			DefineSetter_Decltype(MinFilter, minFilter)
+			DefineSetter_Decltype(MipmapMode, mipmapMode)
+			DefineSetter_Decltype(AddressModeU, addressModeU)
+			DefineSetter_Decltype(AddressModeV, addressModeV)
+			DefineSetter_Decltype(AddressModeW, addressModeW)
+			DefineSetter_Decltype(MipLodBias, mipLodBias)
+			DefineSetter_Decltype(MaxAnisotropy, maxAnisotropy, anisotropyEnable = true)
+			DefineSetter_Decltype(CompareOp, compareOp, compareEnable = true)
+			DefineSetter_Decltype(MinLod, minLod)
+			DefineSetter_Decltype(MaxLod, maxLod)
+			DefineSetter_Decltype(BorderColor, borderColor)
+			DefineSetter_Decltype(UnnormalizedCoordinates, unnormalizedCoordinates));
 		return _{ this };
 	}
 };
@@ -1595,11 +1679,14 @@ VK_ENCAPSULATION_OOP_OBJECT_BEGIN(DescriptorPool) {
 			DescriptorPoolCreateInfo, ParameterList(uint32_t maxSets, ArrayRef<const DescriptorPoolSize> poolSizes),
 			MaxSets(maxSets).
 			PoolSizes(poolSizes),
-			DefineSetter_Copy(Flags, decltype(_::flags), flags));
+			DefineSetter_Decltype(Flags, flags));
 		return _{ this, maxSets, poolSizes };
 	}
 	AUTO   Create() {
-		DefineFunctionRaiiClass_ResultPublic(DescriptorPool, RESULT, Create, DescriptorPoolCreateInfo);
+		DefineFunctionRaiiClass_Result(DescriptorPool, RESULT, Create, DescriptorPoolCreateInfo, , ,
+			DefineSetter_Decltype(Flags, flags)
+			DefineSetter_Decltype(MaxSets, maxSets)
+			DefineSetter_ArrayRef(PoolSizes, const DescriptorPoolSize, poolSizes, poolSizeCount));
 		return _{ this };
 	}
 };
@@ -1628,11 +1715,17 @@ VK_ENCAPSULATION_OOP_OBJECT_BEGIN(Framebuffer) {
 			Width(width).
 			Height(height).
 			Layers(layers),
-			DefineSetter_Copy(Flags, decltype(_::flags), flags));
+			DefineSetter_Decltype(Flags, flags));
 		return _{ this, renderPass, attachments, width, height, layers };
 	}
 	AUTO   Create() {
-		DefineFunctionRaiiClass_ResultPublic(Framebuffer, RESULT, Create, FramebufferCreateInfo);
+		DefineFunctionRaiiClass_Result(Framebuffer, RESULT, Create, FramebufferCreateInfo, , ,
+			DefineSetter_Decltype(Flags, flags)
+			DefineSetter_Decltype(RenderPass, renderPass)
+			DefineSetter_ArrayRef(Attachments, const ImageView_, attachments, attachmentCount)
+			DefineSetter_Decltype(Width, width)
+			DefineSetter_Decltype(Height, height)
+			DefineSetter_Decltype(Layers, layers));
 		return _{ this };
 	}
 };
@@ -1687,11 +1780,13 @@ VK_ENCAPSULATION_OOP_OBJECT_BEGIN(CommandPool) {
 		DefineFunctionRaiiClass_Result(CommandPool, RESULT, Create,
 			CommandPoolCreateInfo, ParameterList(uint32_t queueFamilyIndex),
 			QueueFamilyIndex(queueFamilyIndex),
-			DefineSetter_Copy(Flags, decltype(_::flags), flags));
+			DefineSetter_Decltype(Flags, flags));
 		return _{ this, queueFamilyIndex };
 	}
 	AUTO   Create() {
-		DefineFunctionRaiiClass_ResultPublic(CommandPool, RESULT, Create, CommandPoolCreateInfo);
+		DefineFunctionRaiiClass_Result(CommandPool, RESULT, Create, CommandPoolCreateInfo, , ,
+			DefineSetter_Decltype(Flags, flags)
+			DefineSetter_Decltype(QueueFamilyIndex, queueFamilyIndex));
 		return _{ this };
 	}
 };
@@ -1727,7 +1822,15 @@ VK_ENCAPSULATION_OOP_OBJECT_BEGIN(SamplerYcbcrConversion) {
 		return _{ this, format, ycbcrModel, ycbcrRange, components, xChromaOffset, yChromaOffset, chromaFilter, forceExplicitReconstruction };
 	}
 	AUTO   Create() {
-		DefineFunctionRaiiClass_ResultPublic(SamplerYcbcrConversion, RESULT, Create, SamplerYcbcrConversionCreateInfo);
+		DefineFunctionRaiiClass_Result(SamplerYcbcrConversion, RESULT, Create, SamplerYcbcrConversionCreateInfo, , ,
+			DefineSetter_Decltype(Format, format)
+			DefineSetter_Decltype(YcbcrModel, ycbcrModel)
+			DefineSetter_Decltype(YcbcrRange, ycbcrRange)
+			DefineSetter_Decltype(Components, components)
+			DefineSetter_Decltype(XChromaOffset, xChromaOffset)
+			DefineSetter_Decltype(YChromaOffset, yChromaOffset)
+			DefineSetter_Decltype(ChromaFilter, chromaFilter)
+			DefineSetter_Decltype(ForceExplicitReconstruction, forceExplicitReconstruction));
 		return _{ this };
 	}
 };
@@ -1783,11 +1886,18 @@ VK_ENCAPSULATION_OOP_OBJECT_BEGIN(DescriptorUpdateTemplate) {
 			PipelineBindPoint(pipelineBindPoint).
 			PipelineLayout(pipelineLayout).
 			Set(set),
-			DefineSetter_Copy(Flags, decltype(_::flags), flags));
+			DefineSetter_Decltype(Flags, flags));
 		return _{ this, descriptorUpdateEntries, templateType, descriptorSetLayout, pipelineBindPoint, pipelineLayout, set };
 	}
 	AUTO   Create() {
-		DefineFunctionRaiiClass_ResultPublic(DescriptorUpdateTemplate, RESULT, Create, DescriptorUpdateTemplateCreateInfo);
+		DefineFunctionRaiiClass_Result(DescriptorUpdateTemplate, RESULT, Create, DescriptorUpdateTemplateCreateInfo, , ,
+			DefineSetter_Decltype(Flags, flags)
+			DefineSetter_ArrayRef(DescriptorUpdateEntries, const DescriptorUpdateTemplateEntry, descriptorUpdateEntries, descriptorUpdateEntryCount)
+			DefineSetter_Decltype(TemplateType, templateType)
+			DefineSetter_Decltype(DescriptorSetLayout, descriptorSetLayout)
+			DefineSetter_Decltype(PipelineBindPoint, pipelineBindPoint)
+			DefineSetter_Decltype(PipelineLayout, pipelineLayout)
+			DefineSetter_Decltype(Set, set));
 		return _{ this };
 	}
 };
@@ -1816,7 +1926,8 @@ VK_ENCAPSULATION_OOP_OBJECT_BEGIN(PrivateDataSlot) {
 		return result;
 	}
 	AUTO   Create() {
-		DefineFunctionRaiiClass_Result(PrivateDataSlot, RESULT, Create, PrivateDataSlotCreateInfo, , , DefineSetter_Copy(Flags, decltype(_::flags), flags));
+		DefineFunctionRaiiClass_Result(PrivateDataSlot, RESULT, Create, PrivateDataSlotCreateInfo, , ,
+			DefineSetter_Decltype(Flags, flags));
 		return _{ this };
 	}
 };
@@ -1996,8 +2107,7 @@ VK_ENCAPSULATION_NAMESPACE_END
 #undef DefineFunctionRaiiClass_Result
 #undef DefineFunctionRaiiClass_ResultL
 #undef DefineFunctionRaiiClass_ResultR
-#undef DefineFunctionRaiiClass_ResultPublic
-#undef DefineFunctionRaiiClass_ResultPublicR
-#undef DefineSetter_Copy
+#undef DefineSetter_Decltype
+#undef DefineSetter_Ref
 #undef DefineSetter_ArrayRef
 #undef ObjectClassHeader
