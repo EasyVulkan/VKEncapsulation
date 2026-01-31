@@ -1,6 +1,10 @@
 #pragma once
 #include "Core/VKEncapsulation.h"
+#ifndef M_StbHeader
 #include "stb_image.h"
+#else
+#include M_StbHeader(stb_image.h)
+#endif
 
 #define VK_ENCAPSULATION_EXT_NAMESPACE_BEGIN namespace VK_ENCAPSULATION_NAMESPACE::ext {
 
