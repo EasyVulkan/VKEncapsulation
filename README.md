@@ -34,7 +34,7 @@
 
 * [Core (文档还没写)]() 中的各个文件对 *vulkan_core.h* 提供不同程度的面向对象封装，你可以根据自己的编程风格选择使用部分功能和特性。
 * [Plus (文档还没写)]() 中的文件提供功能上更加特定的封装。
-* [WindowSystem (文档还没写)]() 中的文件提供了执行整个初始化流程的函数封装，以及其它与窗口系统有关的常用功能的函数封装（目前只有对应 [Glfw](https://www.glfw.org/) 和 Win32 API 的版本，因为我只有Win10系统的主机）。<br>
+* [WindowSystem (文档还没写)]() 中的文件提供了执行整个初始化流程的函数封装，以及其它与窗口系统有关的常用功能的函数封装（目前只有对应 [Glfw](https://www.glfw.org/) 和 Win32 API 的版本，因为我只有 Win10 系统的主机）。<br>
 * 近似 C# 的命名风格。
 
 如果你觉得这个库功能上有所欠缺，你也可以结合其它库一起使用。
@@ -165,7 +165,7 @@ CmdPushDescriptorSet(VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout_composition
 
 * 会在线程中切换逻辑设备的程序
 
-    允许在一个线程中重建逻辑设备，但不能来回切换不同逻辑设备，这是为了在满足 “[基于线程的状态机 (文档还没写)]()” 的同时确保安全性并简化程序设计。
+    允许在一个线程中重建逻辑设备，但不能来回切换不同逻辑设备，这是为了在满足 “[基于线程的状态机](docs/VKEncapsulation_快速入门.md/#特性基于线程的状态机)” 的同时确保安全性并简化程序设计。
 
 整个库**不推荐**用于：
 
@@ -197,7 +197,11 @@ CmdPushDescriptorSet(VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout_composition
 目前对应的 Vulkan SDK 版本是 **1.4.328** ，这个库包装了至该版本为止 ***vulkan_core.h*** 中定义的所有可能会被人为使用的结构体和函数。<br>
 你需要使用高于该版本的SDK以使用本项目代码。
 
-本项目不使用版本号，仅在这个文档中标定 **[Core (文档还没写)]() 和 [Plus (文档还没写)]() 两个文件夹**中任意文件的最后更新日期（可看成是以日期为版本号）。
+本项目不使用版本号，仅在这个文档中标定各个文件夹中任意文件的最后更新日期（可看成是以日期为版本号）。
+
+* 当前 Core 的最后更新日期是：**2026.02.01**
+* 当前 Plus 的最后更新日期是：**2026.01.31**
+* 当前 WindowSystem 的最后更新日期是：**2026.02.01**
 
 ### 更新频率
 
@@ -213,7 +217,7 @@ CmdPushDescriptorSet(VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout_composition
 [](二级标题)
 ## 文档一览
 
-* [VKEncapsulation 快速入门 (文档进度1/5)](docs/VKEncapsulation_快速入门.md)
+* [VKEncapsulation 快速入门 (文档进度4/5)](docs/VKEncapsulation_快速入门.md)
 
 [](二级标题)
 ## 示例
