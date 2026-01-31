@@ -125,8 +125,8 @@ auto PreInitialization_SetWindowTitle(ArrayRef<const wchar_t> windowTitle) {
 	_windowTitle = windowTitle;
 	return [] { return _windowTitle; };
 }
-auto PreInitialization_SetWindowCreationCallback(void(*callback)()) {
-	static void(*function)();
+auto PreInitialization_SetWindowCreationCallback(std::type_identity_t<VK_ENCAPSULATION_CALLBACK_TYPE> callback) {
+	static std::type_identity_t<VK_ENCAPSULATION_CALLBACK_TYPE> function;
 	function = callback;
 	return [] { return function; };
 }
