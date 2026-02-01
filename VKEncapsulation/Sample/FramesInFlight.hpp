@@ -114,8 +114,8 @@ int main() {
 
 		ToScreen::CmdEndRendering();
 		commandBuffers[sync].End();
-		VkeApp::Base().SubmitCommandBuffers(sync.Semaphores_ImageIsAvailable(), VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT, commandBuffers[sync], sync.Semaphores_RenderingIsOver(), sync.Fence());
-		VkeApp::Base().PresentImage(sync.Semaphores_RenderingIsOver());
+		VkeApp::Base().SubmitCommandBuffers(sync.Semaphore_ImageIsAvailable(), VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT, commandBuffers[sync], sync.Semaphore_RenderingIsOver(), sync.Fence());
+		VkeApp::Base().PresentImage(sync.Semaphore_RenderingIsOver());
 
 		PollEvents();
 	}

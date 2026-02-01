@@ -59,7 +59,7 @@ public:
 	RESULT ExecuteCommandBuffer(CommandBuffer_ commandBuffer = ThreadContext::CommandBuffer()) const {
 		if (ThreadContext::CommandBuffer())
 			EndCommandBuffer();
-		oop::Fence fence;
+		oop::Fence fence({});
 		Result result = VkeApp::Base().SubmitCommandBuffers(SubmitInfo{}.CommandBuffers(commandBuffer), fence);
 		if (!result)
 			fence.Wait();
@@ -188,14 +188,14 @@ public:
 	}
 	/* Getter */
 	const oop::Fence& Fence() const { return fences[*this]; }
-	Semaphore Semaphores_ImageIsAvailable() const { return semaphores_imageIsAvailable[index_swapImage]; }
-	Semaphore Semaphores_RenderingIsOver() const { return semaphores_renderingIsOver[*this]; }
+	Semaphore Semaphore_ImageIsAvailable() const { return semaphores_imageIsAvailable[index_swapImage]; }
+	Semaphore Semaphore_RenderingIsOver() const { return semaphores_renderingIsOver[*this]; }
 	/* Const Function */
 	operator uint32_t() const { return VkeApp::Base().CurrentSwapchainImageIndex(); }
 	/* Non-const Function */
 	RESULT SwapImage() {
 		index_swapImage = (index_swapImage + 1) % semaphores_imageIsAvailable.size();
-		return VkeApp::Base().SwapImage(Semaphores_ImageIsAvailable());
+		return VkeApp::Base().SwapImage(Semaphore_ImageIsAvailable());
 	}
 };
 #pragma endregion
