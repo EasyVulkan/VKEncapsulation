@@ -118,7 +118,7 @@ protected:
 			DeviceWaitIdle();
 			if (swapchain) {
 				ExecuteCallbacks(callbacks_destroySwapchain);
-				swapchainImageViews.~vector();
+				swapchainImageViews.clear();
 				swapchain.~Object();
 			}
 			ExecuteCallbacks(callbacks_destroyDevice);
@@ -628,8 +628,8 @@ public:
 		recursionGuard = true;
 		ExecuteCallbacks(callbacks_selectPhysicalDevice);
 		recursionGuard = false;
-		queueFamilyProperties.clear();
-		queueFamilyProperties.resize(PhysicalDevice().queueFamilyCount);
+		queueFamilyProperties.clear();                                   //
+		queueFamilyProperties.resize(PhysicalDevice().queueFamilyCount); // Zeroize
 	}
 
 	// ======== For logical device creation
@@ -896,7 +896,7 @@ public:
 				return result;
 			if (swapchain) {
 				ExecuteCallbacks(callbacks_destroySwapchain);
-				swapchainImageViews.~vector();
+				swapchainImageViews.clear();
 				swapchain.~Object();
 				swapchainCreateInfo.OldSwapchain(VK_NULL_HANDLE);
 				presentationQueueIndex = 0;
@@ -928,7 +928,7 @@ public:
 
 		// Destroy old swapchain related objects
 		ExecuteCallbacks(callbacks_destroySwapchain);
-		swapchainImageViews.~vector();
+		swapchainImageViews.clear();
 		// Create swapchain
 		if (Result result = CreateSwapchain_Internal())
 			return result;
