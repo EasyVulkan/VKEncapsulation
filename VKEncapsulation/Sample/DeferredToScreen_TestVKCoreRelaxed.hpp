@@ -350,10 +350,11 @@ int main() {
 		CmdSetScissor(0, Rect2D{ {}, swapchainImageExtent });
 
 		// G-buffer
-		CmdPushDescriptorSet(VK_PIPELINE_BIND_POINT_GRAPHICS, DeferredToScreen::pipelineLayout_gBuffer, 0, WriteDescriptorSet{}.
-			DescriptorType(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER).
-			BufferInfo(
-				DescriptorBufferInfo{}.Buffer(uniformBuffer).Range(sizeof(glm::mat4) * 2)));
+		CmdPushDescriptorSet(VK_PIPELINE_BIND_POINT_GRAPHICS, DeferredToScreen::pipelineLayout_gBuffer, 0,
+			WriteDescriptorSet{}.
+				DescriptorType(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER).
+				BufferInfo(
+					DescriptorBufferInfo{}.Buffer(uniformBuffer).Range(sizeof(glm::mat4) * 2)));
 		CmdBindPipeline(VK_PIPELINE_BIND_POINT_GRAPHICS, DeferredToScreen::pipeline_gBuffer);
 		CmdBindVertexBuffers(0, { vertexBuffer_perVertex, vertexBuffer_perInstance }, { 0, 0 });
 		CmdBindIndexBuffer(indexBuffer, 0, VK_INDEX_TYPE_UINT16);

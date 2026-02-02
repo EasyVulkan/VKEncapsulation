@@ -996,7 +996,7 @@ VK_ENCAPSULATION_STRUCTURE_BEGIN(PipelineCacheCreateInfo) {
 	DefineSetter_Copy(InitialDataSize, size_t, initialDataSize);
 	DefineSetter_ArrayRef(InitialData, const void, initialData, initialDataSize);
 	constexpr auto& InitialData(const IsNotRangeOrPointer auto& initialData) { return InitialData({ sizeof *&initialData, &initialData }); }
-	constexpr auto& InitialData(IsNotRangeOrPointer auto&&) requires(!forTemporaryUsage) = delete;
+	constexpr auto& InitialData(IsNotRangeOrPointer auto&& data) requires(!forTemporaryUsage && std::is_rvalue_reference_v<decltype(data)>) = delete;
 };
 VK_ENCAPSULATION_STRUCTURE_END(PipelineCacheCreateInfo)
 
@@ -1015,7 +1015,7 @@ VK_ENCAPSULATION_STRUCTURE_BEGIN_NO_STYPE(SpecializationInfo) {
 	DefineSetter_Copy(DataSize, size_t, dataSize);
 	DefineSetter_ArrayRef(Data, const void, data, dataSize);
 	constexpr auto& Data(const IsNotRangeOrPointer auto& data) { return Data({ sizeof *&data, &data }); }
-	constexpr auto& Data(IsNotRangeOrPointer auto&&) requires(!forTemporaryUsage) = delete;
+	constexpr auto& Data(IsNotRangeOrPointer auto&& data) requires(!forTemporaryUsage && std::is_rvalue_reference_v<decltype(data)>) = delete;
 };
 VK_ENCAPSULATION_STRUCTURE_END(SpecializationInfo)
 
@@ -3668,7 +3668,7 @@ VK_ENCAPSULATION_STRUCTURE_BEGIN(WriteDescriptorSetInlineUniformBlock) {
 	DefineSetter_Copy(DataSize, uint32_t, dataSize);
 	DefineSetter_ArrayRef(Data, const void, data, dataSize);
 	constexpr auto& Data(const IsNotRangeOrPointer auto& data) { return Data({ sizeof *&data, &data }); }
-	constexpr auto& Data(IsNotRangeOrPointer auto&&) requires(!forTemporaryUsage) = delete;
+	constexpr auto& Data(IsNotRangeOrPointer auto&& data) requires(!forTemporaryUsage && std::is_rvalue_reference_v<decltype(data)>) = delete;
 };
 VK_ENCAPSULATION_STRUCTURE_END(WriteDescriptorSetInlineUniformBlock)
 
@@ -4188,7 +4188,7 @@ VK_ENCAPSULATION_STRUCTURE_BEGIN(PushConstantsInfo) {
 	DefineSetter_Copy(Size, uint32_t, size);
 	DefineSetter_ArrayRef(Values, const void, values, size);
 	constexpr auto& Values(const IsNotRangeOrPointer auto& values) { return Values({ sizeof *&values, &values }); }
-	constexpr auto& Values(IsNotRangeOrPointer auto&&) requires(!forTemporaryUsage) = delete;
+	constexpr auto& Values(IsNotRangeOrPointer auto&& data) requires(!forTemporaryUsage && std::is_rvalue_reference_v<decltype(data)>) = delete;
 };
 VK_ENCAPSULATION_STRUCTURE_END(PushConstantsInfo)
 
@@ -4209,7 +4209,7 @@ VK_ENCAPSULATION_STRUCTURE_BEGIN(PushDescriptorSetWithTemplateInfo) {
 	DefineSetter_Copy(Set, uint32_t, set);
 	DefineSetter_ArrayRefIgnoreC(Data, const void, data);
 	constexpr auto& Data(const IsNotRangeOrPointer auto& data) { pData = &data; return *this; }
-	constexpr auto& Data(IsNotRangeOrPointer auto&&) requires(!forTemporaryUsage) = delete;
+	constexpr auto& Data(IsNotRangeOrPointer auto&& data) requires(!forTemporaryUsage && std::is_rvalue_reference_v<decltype(data)>) = delete;
 };
 VK_ENCAPSULATION_STRUCTURE_END(PushDescriptorSetWithTemplateInfo)
 
@@ -8155,7 +8155,7 @@ VK_ENCAPSULATION_STRUCTURE_BEGIN(ValidationCacheCreateInfoEXT) {
 	DefineSetter_Copy(InitialDataSize, size_t, initialDataSize);
 	DefineSetter_ArrayRef(InitialData, const void, initialData, initialDataSize);
 	constexpr auto& InitialData(const IsNotRangeOrPointer auto& initialData) { return InitialData({ sizeof *&initialData, &initialData }); }
-	constexpr auto& InitialData(IsNotRangeOrPointer auto&&) requires(!forTemporaryUsage) = delete;
+	constexpr auto& InitialData(IsNotRangeOrPointer auto&& data) requires(!forTemporaryUsage && std::is_rvalue_reference_v<decltype(data)>) = delete;
 };
 VK_ENCAPSULATION_STRUCTURE_END(ValidationCacheCreateInfoEXT)
 
@@ -9566,7 +9566,7 @@ VK_ENCAPSULATION_STRUCTURE_BEGIN(OpaqueCaptureDescriptorDataCreateInfoEXT) {
 	StructureClassHeader(OpaqueCaptureDescriptorDataCreateInfoEXT);
 	DefineSetter_Copy(OpaqueCaptureDescriptorData, ArrayRef<const void>, opaqueCaptureDescriptorData);
 	constexpr auto& OpaqueCaptureDescriptorData(const IsNotRangeOrPointer auto& opaqueCaptureDescriptorData) { this->opaqueCaptureDescriptorData = &opaqueCaptureDescriptorData; return *this; }
-	constexpr auto& OpaqueCaptureDescriptorData(IsNotRangeOrPointer auto&&) requires(!forTemporaryUsage) = delete;
+	constexpr auto& OpaqueCaptureDescriptorData(IsNotRangeOrPointer auto&& data) requires(!forTemporaryUsage && std::is_rvalue_reference_v<decltype(data)>) = delete;
 };
 VK_ENCAPSULATION_STRUCTURE_END(OpaqueCaptureDescriptorDataCreateInfoEXT)
 
@@ -11520,7 +11520,7 @@ VK_ENCAPSULATION_STRUCTURE_BEGIN_NO_STYPE(LayerSettingEXT) {
 	constexpr auto& Values(const IsNotRangeOrPointer auto& value) { return Values({ 1, &value }); }
 	constexpr auto& Values(const char*& value) { return Values({ 1, &value }); }
 	constexpr auto& Values(const char8_t*& value) { return Values({ 1, &value }); }
-	constexpr auto& Values(IsNotRangeOrPointer auto&&) requires(!forTemporaryUsage) = delete;
+	constexpr auto& Values(IsNotRangeOrPointer auto&& data) requires(!forTemporaryUsage && std::is_rvalue_reference_v<decltype(data)>) = delete;
 };
 VK_ENCAPSULATION_STRUCTURE_END(LayerSettingEXT)
 
@@ -11645,7 +11645,7 @@ VK_ENCAPSULATION_STRUCTURE_BEGIN(DataGraphPipelineConstantARM) {
 	DefineSetter_Copy(Id, uint32_t, id);
 	DefineSetter_ArrayRefIgnoreC(ConstantData, const void, constantData);
 	constexpr auto& ConstantData(const IsNotRangeOrPointer auto& constantData) { pConstantData = &constantData; return *this; }
-	constexpr auto& ConstantData(IsNotRangeOrPointer auto&&) requires(!forTemporaryUsage) = delete;
+	constexpr auto& ConstantData(IsNotRangeOrPointer auto&& data) requires(!forTemporaryUsage && std::is_rvalue_reference_v<decltype(data)>) = delete;
 };
 VK_ENCAPSULATION_STRUCTURE_END(DataGraphPipelineConstantARM)
 
@@ -12944,7 +12944,7 @@ VK_ENCAPSULATION_STRUCTURE_BEGIN(RayTracingShaderGroupCreateInfoKHR) {
 	DefineSetter_Copy(IntersectionShader, uint32_t, intersectionShader);
 	DefineSetter_ArrayRefIgnoreC(ShaderGroupCaptureReplayHandle, const void, shaderGroupCaptureReplayHandle);
 	constexpr auto& ShaderGroupCaptureReplayHandle(const IsNotRangeOrPointer auto& shaderGroupCaptureReplayHandle) { pShaderGroupCaptureReplayHandle = &shaderGroupCaptureReplayHandle; return *this; }
-	constexpr auto& ShaderGroupCaptureReplayHandle(IsNotRangeOrPointer auto&&) requires(!forTemporaryUsage) = delete;
+	constexpr auto& ShaderGroupCaptureReplayHandle(IsNotRangeOrPointer auto&& data) requires(!forTemporaryUsage && std::is_rvalue_reference_v<decltype(data)>) = delete;
 };
 VK_ENCAPSULATION_STRUCTURE_END(RayTracingShaderGroupCreateInfoKHR)
 

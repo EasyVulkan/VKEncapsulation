@@ -358,9 +358,10 @@ int main() {
 
 		// G-buffer
 		auto bufferInfo = DescriptorBufferInfo{ uniformBuffer, 0, sizeof(glm::mat4) * 2 };
-		CmdPushDescriptorSet(VK_PIPELINE_BIND_POINT_GRAPHICS, DeferredToScreen::pipelineLayout_gBuffer, 0, WriteDescriptorSet{}.
-			DescriptorType(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER).
-			BufferInfo(bufferInfo));
+		CmdPushDescriptorSet(VK_PIPELINE_BIND_POINT_GRAPHICS, DeferredToScreen::pipelineLayout_gBuffer, 0,
+			WriteDescriptorSet{}.
+				DescriptorType(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER).
+				BufferInfo(bufferInfo));
 		CmdBindPipeline(VK_PIPELINE_BIND_POINT_GRAPHICS, DeferredToScreen::pipeline_gBuffer);
 		CmdBindVertexBuffers(0, { vertexBuffer_perVertex, vertexBuffer_perInstance }, { 0, 0 });
 		CmdBindIndexBuffer(indexBuffer, 0, VK_INDEX_TYPE_UINT16);
