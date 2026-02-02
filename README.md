@@ -37,7 +37,7 @@
 * [WindowSystem (文档还没写)]() 中的文件提供了执行整个初始化流程的函数封装，以及其它与窗口系统有关的常用功能的函数封装（目前只有对应 [Glfw](https://www.glfw.org/) 和 Win32 API 的版本，因为我只有 Win10 系统的主机）。<br>
 * 近似 C# 的命名风格。
 
-如果你觉得这个库功能上有所欠缺，你也可以结合其它库一起使用。
+如果你觉得这个库功能上有所欠缺，你也可以结合其它库一起使用（比如 [VMA](https://github.com/GPUOpen-LibrariesAndSDKs/VulkanMemoryAllocator) ）。
 
 [](二级标题)
 ## 简化参数填写及函数调用的效果
@@ -199,8 +199,8 @@ CmdPushDescriptorSet(VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout_composition
 
 本项目不使用版本号，仅在这个文档中标定各个文件夹中任意文件的最后更新日期（可看成是以日期为版本号）。
 
-* 当前 Core 的最后更新日期是：**2026.02.01**
-* 当前 Plus 的最后更新日期是：**2026.01.31**
+* 当前 Core 的最后更新日期是：**2026.02.02**
+* 当前 Plus 的最后更新日期是：**2026.02.01**
 * 当前 WindowSystem 的最后更新日期是：**2026.02.01**
 
 ### 更新频率
