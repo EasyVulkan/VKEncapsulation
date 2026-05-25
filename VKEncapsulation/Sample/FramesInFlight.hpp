@@ -2,7 +2,6 @@
 #include "WindowSystem/Glfw.hpp"
 #define STB_IMAGE_IMPLEMENTATION
 #include "Plus/AppBasePlus.h"
-#include "Timer.h"
 
 VK_ENCAPSULATION_EXT_NAMESPACE_BEGIN
 auto& swapchainImageExtent = VkeApp::Base().SwapchainCreateInfo().imageExtent;
