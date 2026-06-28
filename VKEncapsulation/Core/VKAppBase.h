@@ -737,7 +737,7 @@ public:
 			return result;
 		}
 		// Set image count
-		swapchainCreateInfo.MinImageCount(surfaceCapabilities.minImageCount + (surfaceCapabilities.maxImageCount > surfaceCapabilities.minImageCount));
+		swapchainCreateInfo.MinImageCount(surfaceCapabilities.minImageCount + !surfaceCapabilities.maxImageCount + (surfaceCapabilities.maxImageCount > surfaceCapabilities.minImageCount));
 		// Set image extent
 		swapchainCreateInfo.ImageExtent(
 			surfaceCapabilities.currentExtent.width == UINT32_MAX ?
