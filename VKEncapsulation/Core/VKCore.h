@@ -919,7 +919,7 @@ VK_ENCAPSULATION_STRUCTURE_BEGIN(BufferCreateInfo) {
 	DefineSetter_Copy(Size, VkDeviceSize, size);
 	DefineSetter_Copy(Usage, VkBufferUsageFlags, usage);
 	DefineSetter_Copy(SharingMode, VkSharingMode, sharingMode);
-	DefineSetter_Copy(QueueFamilyIndexCount, uint32_t, queueFamilyIndexCount, sharingMode = true);
+	DefineSetter_Copy(QueueFamilyIndexCount, uint32_t, queueFamilyIndexCount, sharingMode = VK_SHARING_MODE_CONCURRENT);
 	DefineSetter_ArrayRef(QueueFamilyIndices, const uint32_t, queueFamilyIndices, queueFamilyIndexCount, sharingMode = VkSharingMode(bool(queueFamilyIndices)));
 };
 VK_ENCAPSULATION_STRUCTURE_END(BufferCreateInfo)
@@ -946,7 +946,7 @@ VK_ENCAPSULATION_STRUCTURE_BEGIN(ImageCreateInfo) {
 	DefineSetter_Copy(Tiling, VkImageTiling, tiling);
 	DefineSetter_Copy(Usage, VkImageUsageFlags, usage);
 	DefineSetter_Copy(SharingMode, VkSharingMode, sharingMode);
-	DefineSetter_Copy(QueueFamilyIndexCount, uint32_t, queueFamilyIndexCount, sharingMode = true);
+	DefineSetter_Copy(QueueFamilyIndexCount, uint32_t, queueFamilyIndexCount, sharingMode = VK_SHARING_MODE_CONCURRENT);
 	DefineSetter_ArrayRef(QueueFamilyIndices, const uint32_t, queueFamilyIndices, queueFamilyIndexCount, sharingMode = VkSharingMode(bool(queueFamilyIndices)));
 	DefineSetter_Copy(InitialLayout, VkImageLayout, initialLayout);
 };
@@ -8118,7 +8118,7 @@ VK_ENCAPSULATION_STRUCTURE_BEGIN(PhysicalDeviceImageDrmFormatModifierInfoEXT) {
 	StructureClassHeader(PhysicalDeviceImageDrmFormatModifierInfoEXT);
 	DefineSetter_Copy(DrmFormatModifier, uint64_t, drmFormatModifier);
 	DefineSetter_Copy(SharingMode, VkSharingMode, sharingMode);
-	DefineSetter_Copy(QueueFamilyIndexCount, uint32_t, queueFamilyIndexCount, sharingMode = true);
+	DefineSetter_Copy(QueueFamilyIndexCount, uint32_t, queueFamilyIndexCount, sharingMode = VK_SHARING_MODE_CONCURRENT);
 	DefineSetter_ArrayRef(QueueFamilyIndices, const uint32_t, queueFamilyIndices, queueFamilyIndexCount, sharingMode = VkSharingMode(bool(queueFamilyIndices)));
 };
 VK_ENCAPSULATION_STRUCTURE_END(PhysicalDeviceImageDrmFormatModifierInfoEXT)
@@ -10961,7 +10961,7 @@ VK_ENCAPSULATION_STRUCTURE_BEGIN(TensorCreateInfoARM) {
 	DefineSetter_Copy(Flags, VkTensorCreateFlagsARM, flags);
 	DefineSetter_Ref(Description, const VkTensorDescriptionARM, description);
 	DefineSetter_Copy(SharingMode, VkSharingMode, sharingMode);
-	DefineSetter_Copy(QueueFamilyIndexCount, uint32_t, queueFamilyIndexCount, sharingMode = true);
+	DefineSetter_Copy(QueueFamilyIndexCount, uint32_t, queueFamilyIndexCount, sharingMode = VK_SHARING_MODE_CONCURRENT);
 	DefineSetter_ArrayRef(QueueFamilyIndices, const uint32_t, queueFamilyIndices, queueFamilyIndexCount, sharingMode = VkSharingMode(bool(queueFamilyIndices)));
 };
 VK_ENCAPSULATION_STRUCTURE_END(TensorCreateInfoARM)

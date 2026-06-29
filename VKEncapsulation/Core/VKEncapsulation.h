@@ -31,7 +31,7 @@
 #define M_GlfwLibrary(f)      M_MakeStringLiteral(f)
 #endif
 
-#include M_VulkanSdkHeader(Volk/volk.h)
+#include M_VulkanSdkHeader(volk/volk.h)
 #include M_VulkanSdkHeader(vulkan/vk_enum_string_helper.h)
 
 #ifdef VK_ENCAPSULATION_ALLOW_RAII_FUNCTIONS
