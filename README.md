@@ -199,7 +199,7 @@ CmdPushDescriptorSet(VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout_composition
 
 本项目不使用版本号，仅在这个文档中标定各个文件夹中任意文件的最后更新日期（可看成是以日期为版本号）。
 
-* 当前 Core 的最后更新日期是：**2026.02.02**
+* 当前 Core 的最后更新日期是：**2026.06.30**
 * 当前 Plus 的最后更新日期是：**2026.02.01**
 * 当前 WindowSystem 的最后更新日期是：**2026.02.01**
 
