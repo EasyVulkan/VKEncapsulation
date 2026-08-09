@@ -119,14 +119,14 @@ protected:
 			if (swapchain) {
 				ExecuteCallbacks(callbacks_destroySwapchain);
 				swapchainImageViews.clear();
-				swapchain.~Object();
+				Destroy(swapchain);
 			}
 			ExecuteCallbacks(callbacks_destroyDevice);
-			device.~Object();
+			Destroy(device);
 		}
-		surface.~Object();
-		debugMessenger.~Object();
-		instance.~Object();
+		Destroy(surface);
+		Destroy(debugMessenger);
+		Destroy(instance);
 	}
 
 	/* Const Function */
@@ -811,7 +811,7 @@ public:
 		// Destroy retired old swapchain and its associated images
 		if (oldSwapchain &&
 			oldSwapchain != swapchain) // Prevent the destruction of oldSwapchain if RecreateSwapchain() fails
-			oldSwapchain.~Object(),
+			Destroy(oldSwapchain),
 			swapchainCreateInfo.OldSwapchain(VK_NULL_HANDLE);
 		while (Result result = AcquireNextImageKHR(swapchain, UINT64_MAX, signalSemaphore, fence, currentSwapchainImageIndex))
 			switch (result) {
@@ -897,12 +897,12 @@ public:
 			if (swapchain) {
 				ExecuteCallbacks(callbacks_destroySwapchain);
 				swapchainImageViews.clear();
-				swapchain.~Object();
+				Destroy(swapchain);
 				swapchainCreateInfo.OldSwapchain(VK_NULL_HANDLE);
 				presentationQueueIndex = 0;
 			}
 			ExecuteCallbacks(callbacks_destroyDevice);
-			device.~Object();
+			Destroy(device);
 		}
 		return CreateDevice(queueCreateInfos, flags);
 	}
@@ -938,6 +938,7 @@ public:
 	// Call Terminate() if you need to terminate Vulkan before program exits.
 	void Terminate() {
 		this->~ApplicationBase();
+		new(this) ApplicationBase();
 		apiVersion = VK_API_VERSION_1_0;
 		selectedPhysicalDeviceIndex = 0;
 		presentationQueueIndex = 0;

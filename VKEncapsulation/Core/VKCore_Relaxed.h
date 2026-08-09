@@ -102,7 +102,7 @@ const Vk##T* operator&() const { return reinterpret_cast<const Vk##T*>(this); } 
 operator _OptionalRef<const Vk##T, false>() const { return reinterpret_cast<const Vk##T&>(*this); } operator _OptionalRef<const Vk##T, true>() const& { return reinterpret_cast<const Vk##T&>(*this); } operator _OptionalRef<const Vk##T, true>() && = delete;\
 operator    _ArrayRef<const Vk##T, false>() const { return reinterpret_cast<const Vk##T&>(*this); } operator    _ArrayRef<const Vk##T, true>() const& { return reinterpret_cast<const Vk##T&>(*this); } operator    _ArrayRef<const Vk##T, true>() && = delete;
 #define ObjectClassHeader(T) using Handle_T = Vk##T; friend OptionalRef<Vk##T>; friend OptionalRef<Vk##T, true>; friend OptionalRef<const Vk##T>; friend OptionalRef<const Vk##T, true>; friend ArrayRef<Vk##T>; friend ArrayRef<Vk##T, true>; friend ArrayRef<const Vk##T>; friend ArrayRef<const Vk##T, true>;\
-public: Object() = default; Object(Object&&) noexcept = default; Object& operator=(Object&&) noexcept = default;\
+public: Object() = default; Object(Object&&) = default; Object& operator=(Object&& other) noexcept { this->~Object(); new(this) Object(std::move(other)); return *this; }\
 operator const Vk##T&() const { return handle; } const Vk##T* operator&() const { return &handle; } Object* operator&() { return this; }\
 operator OptionalRef<const Vk##T, false>() const { return handle; } operator OptionalRef<const Vk##T, true>() const& { return handle; } operator OptionalRef<const Vk##T, true>() && = delete; \
 operator    ArrayRef<const Vk##T, false>() const { return handle; } operator    ArrayRef<const Vk##T, true>() const& { return handle; }    operator ArrayRef<const Vk##T, true>() && = delete;
@@ -438,7 +438,7 @@ protected:
 public:
 	ObjectBase() = default;
 	ObjectBase(ObjectBase&& other) noexcept : handle(other.handle) { other.handle = VK_NULL_HANDLE; }
-	ObjectBase& operator=(ObjectBase&& other) noexcept { this->~ObjectBase(); handle = other.handle; other.handle = VK_NULL_HANDLE; return *this; }
+	ObjectBase& operator=(ObjectBase&& other) noexcept { handle = other.handle; other.handle = VK_NULL_HANDLE; return *this; }
 	OptionalRef<const VkAllocationCallbacks> Allocator() const { return ThreadContext::Allocator(); }
 };
 template<typename T_Handle>
@@ -449,7 +449,7 @@ protected:
 public:
 	ObjectBase() = default;
 	ObjectBase(ObjectBase&& other) noexcept : handle(other.handle), pAllocator(other.pAllocator) { other.handle = VK_NULL_HANDLE; other.pAllocator = nullptr; }
-	ObjectBase& operator=(ObjectBase&& other) noexcept { this->~ObjectBase(); handle = other.handle; pAllocator = other.pAllocator; other.handle = VK_NULL_HANDLE; other.pAllocator = nullptr; return *this; }
+	ObjectBase& operator=(ObjectBase&& other) noexcept { handle = other.handle; pAllocator = other.pAllocator; other.handle = VK_NULL_HANDLE; other.pAllocator = nullptr; return *this; }
 	OptionalRef<const VkAllocationCallbacks> Allocator() const { if (pAllocator) return *pAllocator; return {}; }
 	OptionalRef<const VkAllocationCallbacks> Allocator() { if (!pAllocator) pAllocator = ThreadContext::PAllocator(); return std::as_const(*this).Allocator(); }
 };
@@ -532,6 +532,12 @@ auto CopyHandles(auto& dstHandles) {
 		}
 	};
 	return _{ dstHandles };
+}
+
+void Destroy(auto& object) {
+	using T = std::decay_t<decltype(object)>;
+	object.~T();
+	new(std::addressof(object)) T();
 }
 
 /* Initialization Function */

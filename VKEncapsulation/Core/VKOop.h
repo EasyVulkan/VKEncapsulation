@@ -834,7 +834,7 @@ VK_ENCAPSULATION_OOP_OBJECT_BEGIN(DeviceMemory) {
 	}
 	/* Non-const Function */
 	Object& operator=(Object&& other) noexcept {
-		this->~Object();
+		Destroy(*this);
 		Move_Internal(std::move(other));
 		return *this;
 	}
@@ -870,7 +870,7 @@ protected:
 	struct { uint8_t bytes[4]; } padding = {}; // Padding bytes of this class, for later use
 	/* Non-const Function */
 	void Move_Internal(Object&& other) {
-		static_cast<Base_T&>(*this) = std::move(other);
+		new(this) Base_T(std::move(other));
 		allocationSize = other.allocationSize;
 		memoryProperties = other.memoryProperties;
 		padding = other.padding;

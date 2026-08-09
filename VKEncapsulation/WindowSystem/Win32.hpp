@@ -224,7 +224,7 @@ bool InitializeWindow(Extent2D size, bool fullScreen = false, bool isResizable =
 }
 void TerminateWindow() {
 	VkeApp::Base().DeviceWaitIdle();
-	mainWindow.~Window();
+	Destroy(mainWindow);
 }
 void MakeWindowFullScreen() {
 	SetWindowLongPtr(mainWindow, GWL_STYLE, WS_POPUP | WS_VISIBLE);

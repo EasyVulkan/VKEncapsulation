@@ -137,8 +137,8 @@ struct DeferredToScreen {
 		auto DestroyPipelines = [] {
 			if (swapchainImageFormat == VkeApp::Base().SwapchainCreateInfo().imageFormat)
 				return;
-			pipeline_gBuffer.~Object();
-			pipeline_composition.~Object();
+			Destroy(pipeline_gBuffer);
+			Destroy(pipeline_composition);
 		};
 		VkeApp::Base().AddCallback_CreateSwapchain(CreatePipelines);
 		VkeApp::Base().AddCallback_DestroySwapchain(DestroyPipelines);
@@ -158,9 +158,9 @@ struct DeferredToScreen {
 			if (attachmentExtent.width == swapchainImageExtent.width &&
 				attachmentExtent.height == swapchainImageExtent.height)
 				return;
-			attachment_normalZ.~ColorAttachment();
-			attachment_albedoSpecular.~ColorAttachment();
-			attachment_depth.~DepthStencilAttachment();
+			Destroy(attachment_normalZ);
+			Destroy(attachment_albedoSpecular);
+			Destroy(attachment_depth);
 		};
 		VkeApp::Base().AddCallback_CreateSwapchain(CreateAttachments);
 		VkeApp::Base().AddCallback_DestroySwapchain(DestroyAttachments);

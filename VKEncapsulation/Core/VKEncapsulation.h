@@ -1,5 +1,6 @@
 #pragma once
 #include <concepts>
+#include <memory>
 #include <array>
 #include <vector>
 #include <ranges>

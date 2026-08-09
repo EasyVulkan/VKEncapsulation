@@ -14,6 +14,7 @@
 * [关于本项目](#关于本项目)
 * [文档一览](#文档一览)
 * [示例](#示例)
+* [更新履历](#更新履历)
 
 [](二级标题)
 ## 功能与特性简述
@@ -199,9 +200,9 @@ CmdPushDescriptorSet(VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout_composition
 
 本项目不使用版本号，仅在这个文档中标定各个文件夹中任意文件的最后更新日期（可看成是以日期为版本号）。
 
-* 当前 Core 的最后更新日期是：**2026.06.30**
-* 当前 Plus 的最后更新日期是：**2026.02.01**
-* 当前 WindowSystem 的最后更新日期是：**2026.02.01**
+* 当前 Core 的最后更新日期是：**2026.08.10**
+* 当前 Plus 的最后更新日期是：**2026.08.10**
+* 当前 WindowSystem 的最后更新日期是：**2026.08.10**
 
 ### 更新频率
 
@@ -243,3 +244,22 @@ CmdPushDescriptorSet(VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout_composition
 * 在动态渲染中使用输入附件
 * 推送描述符（push descriptor）
 * 简易延迟渲染
+
+[](二级标题)
+## 更新履历
+
+* 2026.08.10 修正：移动赋值函数中忘了析构原对象，会造成内存泄漏。-_-|| 当初真是脑袋秀逗了！
+* 2026.08.10 修正：显式调用析构函数后，需要通过 placement new 延续对象[生存期](https://en.cppreference.com/cpp/language/lifetime#Storage_reuse)，否则可能造成未定义行为（虽然 MSVC 和 CLang 并不会为难你）。
+
+    现在可以使用以下两种方式显式地销毁 `vke::raii` 和 `vke::oop` 命名空间中的对象：
+
+    ```cpp
+    // 方式1：调用本次更新的 Destroy(...) 函数
+    Destroy(deviceMemory);
+
+    // 方式2：将一个默认构造的对象移动赋值给原对象（清理C++标准库容器时也可以这么写）
+    deviceMemory = {};
+
+    // 注：我对移动赋值的实现一概没有使用 std::swap(...) 
+    //     基于交换的移动赋值，若等号右侧的对象是被 std::move 的左值，可能在后续造成隐患
+    ```

@@ -41,7 +41,7 @@ class ApplicationBasePlus {
 				GetPhysicalDeviceFormatProperties(Format(i), singleton.formatProperties[i]);
 		};
 		auto CleanUp = [] {
-			singleton.commandPool.~Object();
+			Destroy(singleton.commandPool);
 		};
 		VkeApp::Plus(singleton);
 		VkeApp::Base().AddCallback_CreateDevice(Initialize);
@@ -221,7 +221,7 @@ class StagingBuffer {
 			static StagingBuffer stagingBuffer;
 			// Following code is the purpose of this class,
 			// the callback lambda will set StagingBuffer.bufferMemory.allocationSize to 0, it's not necessary if you don't need to recreate logical device.
-			VkeApp::Base().AddCallback_DestroyDevice([] { stagingBuffer.~StagingBuffer(); });
+			VkeApp::Base().AddCallback_DestroyDevice([] { Destroy(stagingBuffer); });
 			return std::addressof(stagingBuffer);
 		}
 	public:
@@ -262,7 +262,7 @@ public:
 			{}, true);
 	}
 	void Release() {
-		bufferMemory.~BufferMemory();
+		Destroy(bufferMemory);
 	}
 	void* MapMemory(DeviceSize size) {
 		Expand(size);
@@ -308,7 +308,7 @@ public:
 			layerCount > imageFormatProperties.maxArrayLayers ||
 			imageDataSize > imageFormatProperties.maxResourceSize)
 			return VK_NULL_HANDLE;
-		aliasedImage.~Object();
+		Destroy(aliasedImage);
 		aliasedImage.Create(ImageCreateInfo{}.
 			ImageType(imageType).
 			Format(format).
@@ -399,7 +399,7 @@ public:
 		RESULT{ result }; // To throw
 	}
 	void Recreate(DeviceSize size, BufferUsageFlags desiredUsages_Without_transfer_dst, STypeStructureRef<true> next_allocateInfo = {}) {
-		bufferMemory.~BufferMemory();
+		Destroy(bufferMemory);
 		Create(size, desiredUsages_Without_transfer_dst, next_allocateInfo);
 	}
 };
@@ -1217,7 +1217,7 @@ public:
 		queryPool.Create(VK_QUERY_TYPE_OCCLUSION, Capacity());
 	}
 	void Recreate(uint32_t capacity) {
-		queryPool.~Object();
+		Destroy(queryPool);
 		Create(capacity);
 	}
 	RESULT GetResults() {
@@ -1332,7 +1332,7 @@ public:
 		queryPool.Create(VK_QUERY_TYPE_TIMESTAMP, Capacity());
 	}
 	void Recreate(uint32_t capacity) {
-		queryPool.~Object();
+		Destroy(queryPool);
 		Create(capacity);
 	}
 	RESULT GetResults() {

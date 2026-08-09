@@ -42,7 +42,7 @@ struct ToScreen {
 		auto DestroyPipeline = [] {
 			if (swapchainImageFormat == VkeApp::Base().SwapchainCreateInfo().imageFormat)
 				return;
-			pipeline.~Object();
+			Destroy(pipeline);
 		};
 		VkeApp::Base().AddCallback_CreateSwapchain(CreatePipeline);
 		VkeApp::Base().AddCallback_DestroySwapchain(DestroyPipeline);
