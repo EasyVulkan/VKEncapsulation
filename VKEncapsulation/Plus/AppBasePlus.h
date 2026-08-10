@@ -72,7 +72,7 @@ VK_ENCAPSULATION_NAMESPACE_END
 
 VK_ENCAPSULATION_EXT_NAMESPACE_BEGIN
 
-struct GraphicsPipelineCreateInfoPack{
+struct GraphicsPipelineCreateInfoPack {
 	GraphicsPipelineCreateInfo createInfo;
 	// Shader
 	std::vector<PipelineShaderStageCreateInfo> shaderStageCis;
@@ -1212,9 +1212,8 @@ public:
 	}
 	/* Non-const Function */
 	void Create(uint32_t capacity) {
-		passingSampleCounts.resize(capacity);
-		passingSampleCounts.shrink_to_fit();
 		queryPool.Create(VK_QUERY_TYPE_OCCLUSION, Capacity());
+		passingSampleCounts.resize(capacity);
 	}
 	void Recreate(uint32_t capacity) {
 		Destroy(queryPool);
@@ -1327,9 +1326,8 @@ public:
 	}
 	/* Non-const Function */
 	void Create(uint32_t capacity) {
-		timestamps.resize(capacity);
-		timestamps.shrink_to_fit();
 		queryPool.Create(VK_QUERY_TYPE_TIMESTAMP, Capacity());
+		timestamps.resize(capacity);
 	}
 	void Recreate(uint32_t capacity) {
 		Destroy(queryPool);
