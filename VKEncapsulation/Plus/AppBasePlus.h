@@ -917,7 +917,7 @@ public:
 	/* Non-const Function */
 	void Create(const char* filepath, Extent2D extentInTiles, Format format_initial, Format format_final, bool generateMipmap = true) {
 		if (extentInTiles.width * extentInTiles.height > VkeApp::Base().PhysicalDevice().Properties().limits.maxImageArrayLayers) {
-			OutputMessage("[ vke::ext::Texture2DArray ] ERROR\nLayer count is out of limit! Must be less than: {}\nFile: {}\n", VkeApp::Base().PhysicalDevice().Properties().limits.maxImageArrayLayers, filepath);
+			OutputMessage("[ vke::ext::Texture2DArray ] ERROR\nLayer count is out of limit! Must be less than or equal to: {}\nFile: {}\n", VkeApp::Base().PhysicalDevice().Properties().limits.maxImageArrayLayers, filepath);
 			return;
 		}
 		Extent2D fullExtent;
@@ -932,7 +932,7 @@ public:
 	void Create(const uint8_t* pImageData, Extent2D fullExtent, Extent2D extentInTiles, Format format_initial, Format format_final, bool generateMipmap = true) {
 		layerCount = extentInTiles.width * extentInTiles.height;
 		if (layerCount > VkeApp::Base().PhysicalDevice().Properties().limits.maxImageArrayLayers) {
-			OutputMessage("[ vke::ext::Texture2DArray ] ERROR\nLayer count is out of limit! Must be less than: {}\n", VkeApp::Base().PhysicalDevice().Properties().limits.maxImageArrayLayers);
+			OutputMessage("[ vke::ext::Texture2DArray ] ERROR\nLayer count is out of limit! Must be less than or equal to: {}\n", VkeApp::Base().PhysicalDevice().Properties().limits.maxImageArrayLayers);
 			return;
 		}
 		if (fullExtent.width % extentInTiles.width ||
@@ -961,7 +961,7 @@ public:
 	}
 	void Create(ArrayRef<const char* const> filepaths, Format format_initial, Format format_final, bool generateMipmap = true) {
 		if (filepaths.size() > VkeApp::Base().PhysicalDevice().Properties().limits.maxImageArrayLayers) {
-			OutputMessage("[ vke::ext::Texture2DArray ] ERROR\nLayer count is out of limit! Must be less than: {}\n", VkeApp::Base().PhysicalDevice().Properties().limits.maxImageArrayLayers);
+			OutputMessage("[ vke::ext::Texture2DArray ] ERROR\nLayer count is out of limit! Must be less than or equal to: {}\n", VkeApp::Base().PhysicalDevice().Properties().limits.maxImageArrayLayers);
 			return;
 		}
 		std::unique_ptr psImageData = std::make_unique<std::unique_ptr<uint8_t[]>[]>(filepaths.size());
@@ -984,7 +984,7 @@ public:
 	void Create(ArrayRef<const uint8_t* const> psImageData, Extent2D extent, Format format_initial, Format format_final, bool generateMipmap = true) {
 		layerCount = psImageData.size();
 		if (layerCount > VkeApp::Base().PhysicalDevice().Properties().limits.maxImageArrayLayers) {
-			OutputMessage("[ vke::ext::Texture2DArray ] ERROR\nLayer count is out of limit! Must be less than: {}\n", VkeApp::Base().PhysicalDevice().Properties().limits.maxImageArrayLayers);
+			OutputMessage("[ vke::ext::Texture2DArray ] ERROR\nLayer count is out of limit! Must be less than or equal to: {}\n", VkeApp::Base().PhysicalDevice().Properties().limits.maxImageArrayLayers);
 			return;
 		}
 		this->extent = extent;
