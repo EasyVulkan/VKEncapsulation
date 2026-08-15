@@ -43,16 +43,16 @@ class FnCompileGlslToSpv {
 	shaderc::CompileOptions options;
 	shaderc::SpvCompilationResult result;
 	/* Static Function */
-	static void LoadFile(const char* filepath, std::vector<char>& binaries) {
+	static void LoadFile(const char* filepath, std::vector<char>& bytes) {
 		std::ifstream file(filepath, std::ios::ate | std::ios::binary);
 		if (!file) {
 			std::cout << std::format("[ vke::ext::FnCompileGlslToSpv ] ERROR\nFailed to open the file: {}\n", filepath);
 			return;
 		}
 		size_t fileSize = size_t(file.tellg());
-		binaries.resize(fileSize);
+		bytes.resize(fileSize);
 		file.seekg(0);
-		file.read(reinterpret_cast<char*>(binaries.data()), fileSize);
+		file.read(reinterpret_cast<char*>(bytes.data()), fileSize);
 		file.close();
 	}
 public:
@@ -69,10 +69,10 @@ public:
 		return { result.begin(), size_t(result.end() - result.begin()) * 4 };
 	}
 	ArrayRef<const uint32_t> operator()(const char* filepath, const char* entry = "main") {
-		std::vector<char> binaries;
-		LoadFile(filepath, binaries);
-		if (size_t fileSize = binaries.size())
-			return (*this)(binaries, filepath, entry);
+		std::vector<char> code;
+		LoadFile(filepath, code);
+		if (code.size())
+			return (*this)(code, filepath, entry);
 		return {};
 	}
 };

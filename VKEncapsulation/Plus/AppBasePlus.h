@@ -753,8 +753,8 @@ public:
 		return LoadFile_Internal(filepath, 0, extent, requiredFormatInfo);
 	}
 	[[nodiscard]]
-	static std::unique_ptr<uint8_t[]> LoadFile(const uint8_t* fileBinaries, size_t fileSize, Ref<Extent2D> extent, FormatInfo requiredFormatInfo) {
-		return LoadFile_Internal(fileBinaries, fileSize, extent, requiredFormatInfo);
+	static std::unique_ptr<uint8_t[]> LoadFile(const uint8_t* fileBytes, size_t fileSize, Ref<Extent2D> extent, FormatInfo requiredFormatInfo) {
+		return LoadFile_Internal(fileBytes, fileSize, extent, requiredFormatInfo);
 	}
 	static uint32_t CalculateMipLevelCount(Extent2D extent) {
 		return uint32_t(std::floor(std::log2(std::max(extent.width, extent.height)))) + 1;

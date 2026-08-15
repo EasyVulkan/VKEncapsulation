@@ -1163,11 +1163,11 @@ protected:
 			return VK_RESULT_MAX_ENUM; // No proper VkResult enum value
 		}
 		size_t fileSize = size_t(file.tellg());
-		std::vector<uint32_t> binaries(fileSize / 4);
+		std::vector<uint32_t> code(fileSize / 4);
 		file.seekg(0);
-		file.read(reinterpret_cast<char*>(binaries.data()), fileSize);
+		file.read(reinterpret_cast<char*>(code.data()), fileSize);
 		file.close();
-		createInfo.Code(binaries);
+		createInfo.Code(code);
 		return Create(createInfo);
 	}
 };
